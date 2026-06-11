@@ -1,0 +1,46 @@
+// firebase_options.dart
+// Gerado a partir do GoogleService-Info.plist do projeto iOS existente.
+//
+// ⚠️  Android: para publicar no Android, adicione o app Android no Firebase Console,
+//     baixe o google-services.json e substitua os valores em `android` abaixo,
+//     ou rode `flutterfire configure` para gerar automaticamente.
+
+import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kIsWeb, TargetPlatform;
+
+class DefaultFirebaseOptions {
+  static FirebaseOptions get currentPlatform {
+    if (kIsWeb) {
+      throw UnsupportedError('Web não configurado.');
+    }
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return android;
+      case TargetPlatform.iOS:
+        return ios;
+      default:
+        throw UnsupportedError('Plataforma não suportada.');
+    }
+  }
+
+  // ⚠️  Preencha com os valores do google-services.json ao adicionar Android no Firebase
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'PREENCHER_ANDROID_API_KEY',
+    appId: 'PREENCHER_ANDROID_APP_ID',
+    messagingSenderId: '3429544640',
+    projectId: 'chefalysson',
+    storageBucket: 'chefalysson.firebasestorage.app',
+  );
+
+  // Valores extraídos do GoogleService-Info.plist
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyD8xL1fJxNXqthhkTY8vrg97xSblSrU1PQ',
+    appId: '1:3429544640:ios:881a0b0c36c9e7fb7f7325',
+    messagingSenderId: '3429544640',
+    projectId: 'chefalysson',
+    storageBucket: 'chefalysson.firebasestorage.app',
+    iosClientId: '3429544640-r15i9n1r2orqprbqjstvkdr063jnen9c.apps.googleusercontent.com',
+    iosBundleId: 'santos.ChefAlysson',
+  );
+}

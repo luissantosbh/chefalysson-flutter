@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>3429544640-r15i9n1r2orqprbqjstvkdr063jnen9c.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.3429544640-r15i9n1r2orqprbqjstvkdr063jnen9c</string>
+	<key>API_KEY</key>
+	<string>AIzaSyD8xL1fJxNXqthhkTY8vrg97xSblSrU1PQ</string>
+	<key>GCM_SENDER_ID</key>
+	<string>3429544640</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>santos.ChefAlysson</string>
+	<key>PROJECT_ID</key>
+	<string>chefalysson</string>
+	<key>STORAGE_BUCKET</key>
+	<string>chefalysson.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:3429544640:ios:881a0b0c36c9e7fb7f7325</string>
+</dict>
+</plist>
