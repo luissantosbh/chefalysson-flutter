@@ -25,22 +25,23 @@ class DefaultFirebaseOptions {
   }
 
   // ⚠️  Preencha com os valores do google-services.json ao adicionar Android no Firebase
+
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'PREENCHER_ANDROID_API_KEY',
-    appId: 'PREENCHER_ANDROID_APP_ID',
+    apiKey: 'AIzaSyDWGv8wCPuRZqdodKveeYZX5y_DyPDI2Kg',
+    appId: '1:3429544640:android:d5b840388ffc2d727f7325',
     messagingSenderId: '3429544640',
     projectId: 'chefalysson',
     storageBucket: 'chefalysson.firebasestorage.app',
   );
-
   // Valores extraídos do GoogleService-Info.plist
+
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyD8xL1fJxNXqthhkTY8vrg97xSblSrU1PQ',
     appId: '1:3429544640:ios:881a0b0c36c9e7fb7f7325',
     messagingSenderId: '3429544640',
     projectId: 'chefalysson',
     storageBucket: 'chefalysson.firebasestorage.app',
-    iosClientId: '3429544640-r15i9n1r2orqprbqjstvkdr063jnen9c.apps.googleusercontent.com',
+    iosClientId: '3429544640-k2nl7bhmk9nc4r8p6554438u2jgom29j.apps.googleusercontent.com',
     iosBundleId: 'santos.ChefAlysson',
   );
 }
