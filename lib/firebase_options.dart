@@ -37,11 +37,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyD8xL1fJxNXqthhkTY8vrg97xSblSrU1PQ',
-    appId: '1:3429544640:ios:881a0b0c36c9e7fb7f7325',
+    appId: '1:3429544640:ios:81198a870203ec997f7325',
     messagingSenderId: '3429544640',
     projectId: 'chefalysson',
     storageBucket: 'chefalysson.firebasestorage.app',
-    iosClientId: '3429544640-k2nl7bhmk9nc4r8p6554438u2jgom29j.apps.googleusercontent.com',
-    iosBundleId: 'santos.ChefAlysson',
+    androidClientId: '3429544640-22b17s4adkt89v5234qkb9g2jcts9eqf.apps.googleusercontent.com',
+    iosClientId: '3429544640-ij4kdea7t8bvdd8d4qgt5enupcurind2.apps.googleusercontent.com',
+    iosBundleId: 'com.santos.chefAlysson',
   );
 }

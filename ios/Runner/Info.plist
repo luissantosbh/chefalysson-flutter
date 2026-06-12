@@ -27,18 +27,17 @@
 
 	<!-- Google Sign-In: CLIENT_ID do GoogleService-Info.plist -->
 	<key>GIDClientID</key>
-	<string>3429544640-r15i9n1r2orqprbqjstvkdr063jnen9c.apps.googleusercontent.com</string>
+	<string>3429544640-ij4kdea7t8bvdd8d4qgt5enupcurind2.apps.googleusercontent.com</string>
 
-	<!-- URL Schemes necessários para Google Sign-In e Apple Sign-In -->
+	<!-- URL Schemes necessários para Google Sign-In -->
 	<key>CFBundleURLTypes</key>
 	<array>
-		<!-- Google Sign-In: REVERSED_CLIENT_ID do GoogleService-Info.plist -->
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.3429544640-r15i9n1r2orqprbqjstvkdr063jnen9c</string>
+				<string>com.googleusercontent.apps.3429544640-ij4kdea7t8bvdd8d4qgt5enupcurind2</string>
 			</array>
 		</dict>
 	</array>
