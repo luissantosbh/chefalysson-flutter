@@ -63,10 +63,7 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 
-	<!-- Permissão de câmera (usado pelo leitor de QR Code dos bancos, se necessário) -->
-	<key>NSCameraUsageDescription</key>
-	<string>Necessário para leitura de QR Code PIX</string>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
+<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
