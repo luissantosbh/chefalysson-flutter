@@ -43,6 +43,6 @@ class DefaultFirebaseOptions {
     storageBucket: 'chefalysson.firebasestorage.app',
     androidClientId: '3429544640-22b17s4adkt89v5234qkb9g2jcts9eqf.apps.googleusercontent.com',
     iosClientId: '3429544640-ij4kdea7t8bvdd8d4qgt5enupcurind2.apps.googleusercontent.com',
-    iosBundleId: 'com.santos.chefAlysson',
+    iosBundleId: 'santos.ChefAlysson',
   );
 }
