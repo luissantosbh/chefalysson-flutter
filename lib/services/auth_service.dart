@@ -19,6 +19,10 @@ class AuthService extends ChangeNotifier {
   AppUser? _user;
   String? _errorMessage;
 
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    serverClientId: "3429544640-rbeq0uhf2gdhpr0ctospmdhflmf5591q.apps.googleusercontent.com",
+  );
+
   AppUser? get user => _user;
   String? get errorMessage => _errorMessage;
   bool get isLoggedIn => _user != null;
@@ -55,7 +59,7 @@ class AuthService extends ChangeNotifier {
     }
 
     // Tenta restaurar Google
-    GoogleSignIn().signInSilently().then((googleUser) {
+    _googleSignIn.signInSilently().then((googleUser) {
       if (googleUser != null) {
         _user = AppUser(
           id: firebaseUser.uid,
@@ -90,7 +94,7 @@ class AuthService extends ChangeNotifier {
 
   Future<void> signInWithGoogle() async {
     try {
-      final googleUser = await GoogleSignIn().signIn();
+      final googleUser = await _googleSignIn.signIn();
       if (googleUser == null) return; // cancelado
 
       final googleAuth = await googleUser.authentication;
@@ -200,7 +204,7 @@ class AuthService extends ChangeNotifier {
   // -------------------------------------------------------------------------
 
   Future<void> signOut() async {
-    await GoogleSignIn().signOut();
+    await _googleSignIn.signOut();
     await FirebaseAuth.instance.signOut();
     _user = null;
     notifyListeners();
