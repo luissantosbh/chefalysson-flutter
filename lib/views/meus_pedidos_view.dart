@@ -4,8 +4,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:chef_alysson/models/food_category.dart';
+import 'package:chef_alysson/models/menu_item.dart';
 import 'package:chef_alysson/models/order.dart';
 import 'package:chef_alysson/services/auth_service.dart';
+import 'package:chef_alysson/services/cart_store.dart';
 import 'package:chef_alysson/services/order_service.dart';
 
 class MeusPedidosView extends StatefulWidget {
@@ -163,9 +166,61 @@ class _OrderCard extends StatelessWidget {
                       color: Colors.red)),
             ],
           ),
+          const SizedBox(height: 12),
+
+          // Botão repetir pedido
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () => _repeatOrder(context),
+              icon: const Icon(Icons.replay_rounded, size: 16),
+              label: const Text('Repetir pedido'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: const Color(0xFFBF1921),
+                side: const BorderSide(color: Color(0xFFBF1921)),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  void _repeatOrder(BuildContext context) {
+    final cart = context.read<CartStore>();
+    cart.clear();
+
+    for (final lineItem in order.items) {
+      // Cria um MenuItem sintético a partir do item do pedido
+      final menuItem = MenuItem(
+        id: lineItem.name.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '_'),
+        name: lineItem.name,
+        details: '',
+        price: lineItem.unitPrice,
+        category: FoodCategory.combos,
+        emoji: lineItem.emoji,
+      );
+      for (var i = 0; i < lineItem.quantity; i++) {
+        cart.add(menuItem);
+      }
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Itens adicionados ao carrinho!'),
+        behavior: SnackBarBehavior.floating,
+        action: SnackBarAction(
+          label: 'OK',
+          onPressed: () {},
+        ),
+      ),
+    );
+
+    // Volta para a tela principal (tabs)
+    Navigator.popUntil(context, (route) => route.isFirst);
   }
 }
 

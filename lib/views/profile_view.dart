@@ -110,7 +110,7 @@ class ProfileView extends StatelessWidget {
             children: [
               const ListTile(
                 leading: Icon(Icons.access_time_rounded),
-                title: Text('Seg a Dom • 18h às 23h'),
+                title: Text('Seg a Dom • 18h30 às 23h30'),
                 dense: true,
               ),
               const ListTile(

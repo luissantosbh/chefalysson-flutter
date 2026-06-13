@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:chef_alysson/models/food_category.dart';
 import 'package:chef_alysson/models/menu_item.dart';
 import 'package:chef_alysson/services/cart_store.dart';
+import 'package:chef_alysson/services/menu_service.dart';
 
 class MenuView extends StatefulWidget {
   const MenuView({super.key});
@@ -25,21 +26,16 @@ class _MenuViewState extends State<MenuView> {
     super.dispose();
   }
 
-  List<MenuItem> get _filteredItems {
+  List<MenuItem> _filteredItems(MenuService menu) {
     if (_searchText.isNotEmpty) {
-      final q = _searchText.toLowerCase();
-      return MenuData.items.where((item) {
-        return item.name.toLowerCase().contains(q) ||
-            item.details.toLowerCase().contains(q);
-      }).toList();
+      return menu.search(_searchText);
     }
-    return MenuData.items
-        .where((item) => item.category == _selectedCategory)
-        .toList();
+    return menu.byCategory(_selectedCategory);
   }
 
   @override
   Widget build(BuildContext context) {
+    final menu = context.watch<MenuService>();
     return Scaffold(
       appBar: AppBar(
         title: const Text('🍣 Cardápio'),
@@ -99,13 +95,16 @@ class _MenuViewState extends State<MenuView> {
 
           // Lista de itens
           Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              itemCount: _filteredItems.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
-              itemBuilder: (_, index) =>
-                  _MenuItemRow(item: _filteredItems[index]),
-            ),
+            child: menu.isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : ListView.separated(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 8),
+                    itemCount: _filteredItems(menu).length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (_, index) =>
+                        _MenuItemRow(item: _filteredItems(menu)[index]),
+                  ),
           ),
         ],
       ),

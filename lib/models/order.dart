@@ -3,6 +3,8 @@
 
 import 'package:flutter/material.dart';
 
+import 'package:chef_alysson/models/address.dart';
+
 enum OrderStatus {
   pendente,
   pagamentoConfirmado,
@@ -118,6 +120,7 @@ class Order {
   final double total;
   OrderStatus status;
   final DateTime createdAt;
+  final DeliveryAddress? deliveryAddress;
 
   Order({
     required this.id,
@@ -128,6 +131,7 @@ class Order {
     required this.total,
     required this.status,
     required this.createdAt,
+    this.deliveryAddress,
   });
 
   String get totalFormatted =>

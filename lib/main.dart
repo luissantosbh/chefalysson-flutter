@@ -7,8 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:chef_alysson/firebase_options.dart';
+import 'package:chef_alysson/services/address_service.dart';
 import 'package:chef_alysson/services/auth_service.dart';
 import 'package:chef_alysson/services/cart_store.dart';
+import 'package:chef_alysson/services/menu_service.dart';
 import 'package:chef_alysson/services/order_service.dart';
 import 'package:chef_alysson/views/admin_orders_view.dart';
 import 'package:chef_alysson/views/biografia_view.dart';
@@ -39,6 +41,8 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => CartStore()),
         ChangeNotifierProvider(create: (_) => OrderService()),
+        ChangeNotifierProvider(create: (_) => AddressService()),
+        ChangeNotifierProvider(create: (_) => MenuService()..startListening()),
       ],
       child: const ChefAlyssonApp(),
     ),
@@ -74,15 +78,37 @@ class ChefAlyssonApp extends StatelessWidget {
 // RootView — decide entre Login e o app principal
 // ---------------------------------------------------------------------------
 
-class RootView extends StatelessWidget {
+class RootView extends StatefulWidget {
   const RootView({super.key});
 
   @override
+  State<RootView> createState() => _RootViewState();
+}
+
+class _RootViewState extends State<RootView> {
+  String? _lastUserId;
+
+  @override
   Widget build(BuildContext context) {
-    final isLoggedIn = context.watch<AuthService>().isLoggedIn;
+    final auth = context.watch<AuthService>();
+    final userId = auth.user?.id;
+
+    // Load address whenever a new user logs in
+    if (userId != null && userId != _lastUserId) {
+      _lastUserId = userId;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<AddressService>().load(userId);
+      });
+    } else if (userId == null && _lastUserId != null) {
+      _lastUserId = null;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<AddressService>().clear();
+      });
+    }
+
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
-      child: isLoggedIn
+      child: auth.isLoggedIn
           ? const MainTabView(key: ValueKey('main'))
           : const LoginView(key: ValueKey('login')),
     );

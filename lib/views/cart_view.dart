@@ -5,8 +5,43 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:chef_alysson/models/cart_item.dart';
+import 'package:chef_alysson/services/address_service.dart';
 import 'package:chef_alysson/services/cart_store.dart';
+import 'package:chef_alysson/views/address_form_view.dart';
 import 'package:chef_alysson/views/pix_checkout_view.dart';
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+void _goToCheckout(BuildContext context) {
+  final addrSvc = context.read<AddressService>();
+  if (!addrSvc.hasAddress) {
+    // Mostra formulário de endereço primeiro; vai para PIX depois de salvar
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AddressFormView(
+          onSaved: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              fullscreenDialog: true,
+              builder: (_) => const PixCheckoutView(),
+            ),
+          ),
+        ),
+      ),
+    );
+  } else {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => const PixCheckoutView(),
+      ),
+    );
+  }
+}
 
 class CartView extends StatelessWidget {
   const CartView({super.key});
@@ -90,6 +125,9 @@ class CartView extends StatelessWidget {
           ),
         ),
 
+        // Endereço de entrega (resumo ou botão para adicionar)
+        _AddressSummaryBar(),
+
         // Botão PIX
         Container(
           color: Theme.of(context).colorScheme.surface,
@@ -97,13 +135,7 @@ class CartView extends StatelessWidget {
           child: SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  fullscreenDialog: true,
-                  builder: (_) => const PixCheckoutView(),
-                ),
-              ),
+              onPressed: () => _goToCheckout(context),
               icon: const Icon(Icons.qr_code_rounded),
               label: Text(
                 'Pagar com PIX • ${cart.totalFormatted}',
@@ -121,6 +153,74 @@ class CartView extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Barra de resumo do endereço (exibida no carrinho acima do botão PIX)
+// ---------------------------------------------------------------------------
+
+class _AddressSummaryBar extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final addrSvc = context.watch<AddressService>();
+    final addr = addrSvc.address;
+
+    final hasAddr = addr != null && addr.isValid;
+
+    return InkWell(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => AddressFormView(
+            onSaved: () {},
+          ),
+        ),
+      ),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: hasAddr
+              ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.4)
+              : Colors.orange.withOpacity(0.1),
+          border: Border(
+            top: BorderSide(
+                color: hasAddr ? Colors.transparent : Colors.orange.shade200),
+            bottom: BorderSide(
+                color: hasAddr ? Colors.transparent : Colors.orange.shade200),
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              hasAddr ? Icons.location_on_rounded : Icons.location_off_rounded,
+              size: 18,
+              color: hasAddr
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.orange,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: hasAddr
+                  ? Text(
+                      addr.summary.replaceAll('\n', ' • '),
+                      style: const TextStyle(fontSize: 12),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )
+                  : const Text(
+                      'Adicione seu endereço de entrega',
+                      style: TextStyle(fontSize: 12, color: Colors.orange),
+                    ),
+            ),
+            Icon(Icons.edit_rounded,
+                size: 14,
+                color: Theme.of(context).colorScheme.onSurfaceVariant),
+          ],
+        ),
+      ),
     );
   }
 }

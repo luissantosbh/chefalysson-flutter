@@ -38,6 +38,12 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+    target.build_configurations.each do |config|
+      if config.name == "Release"
+        config.build_settings["CODE_SIGN_IDENTITY"] = "Apple Distribution"
+        config.build_settings["DEVELOPMENT_TEAM"] = "F4J68BQ5VP"
+      end
+    end
 
     # Strip iCloud Drive xattrs (com.apple.FinderInfo) that codesign rejects.
     # This project is on an iCloud-synced Desktop; newly created bundle dirs

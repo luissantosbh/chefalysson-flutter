@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart' hide Order;
 import 'package:flutter/foundation.dart';
 
+import 'package:chef_alysson/models/address.dart';
 import 'package:chef_alysson/models/cart_item.dart';
 import 'package:chef_alysson/models/order.dart';
 
@@ -32,6 +33,7 @@ class OrderService extends ChangeNotifier {
     required String userName,
     required List<CartItem> cartItems,
     required String pixOrderId,
+    DeliveryAddress? deliveryAddress,
   }) async {
     final ref = FirebaseFirestore.instance.collection('orders').doc();
 
@@ -55,6 +57,8 @@ class OrderService extends ChangeNotifier {
       'total': total,
       'status': OrderStatus.pendente.rawValue,
       'createdAt': FieldValue.serverTimestamp(),
+      if (deliveryAddress != null)
+        'deliveryAddress': deliveryAddress.toMap(),
     });
 
     return ref.id;
@@ -188,6 +192,12 @@ class OrderService extends ChangeNotifier {
       );
     }).whereType<OrderLineItem>().toList();
 
+    DeliveryAddress? deliveryAddress;
+    final rawAddr = d['deliveryAddress'];
+    if (rawAddr is Map<String, dynamic>) {
+      deliveryAddress = DeliveryAddress.fromMap(rawAddr);
+    }
+
     return Order(
       id: doc.id,
       userId: userId,
@@ -197,6 +207,7 @@ class OrderService extends ChangeNotifier {
       total: total,
       status: status,
       createdAt: createdAt,
+      deliveryAddress: deliveryAddress,
     );
   }
 

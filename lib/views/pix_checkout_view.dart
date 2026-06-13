@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+import 'package:chef_alysson/services/address_service.dart';
 import 'package:chef_alysson/services/auth_service.dart';
 import 'package:chef_alysson/services/cart_store.dart';
 import 'package:chef_alysson/services/order_service.dart';
@@ -51,11 +52,13 @@ class _PixCheckoutViewState extends State<PixCheckoutView> {
     });
 
     try {
+      final address = context.read<AddressService>().address;
       await orders.createOrder(
         userId: auth.user!.id,
         userName: auth.user!.name,
         cartItems: cart.items,
         pixOrderId: _orderId,
+        deliveryAddress: address,
       );
       if (mounted) setState(() => _orderConfirmed = true);
     } catch (e) {
