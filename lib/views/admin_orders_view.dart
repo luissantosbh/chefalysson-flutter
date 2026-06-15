@@ -216,6 +216,11 @@ class _AdminOrderCard extends StatelessWidget {
         .map((i) => '   ${i.quantity}× ${i.name}')
         .join('\n');
 
+    final obs = order.observacao;
+    final obsLine = (obs != null && obs.isNotEmpty)
+        ? '\n📝 *Observação:* $obs'
+        : '';
+
     return '''🛵 *Novo pedido para entrega*
 
 👤 *Cliente:* $nome
@@ -223,7 +228,7 @@ class _AdminOrderCard extends StatelessWidget {
 $enderecoLines
 
 🍣 *Pedido:*
-$itensList
+$itensList$obsLine
 
 💰 *Total:* ${order.totalFormatted}
 💳 *Pagamento:* PIX''';
@@ -286,6 +291,35 @@ $itensList
                   ],
                 ),
               )),
+
+          // Observação (fundo amarelo, só se preenchida)
+          if (order.observacao != null &&
+              order.observacao!.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF9C4),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFFFEB3B)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('⚠️ ', style: TextStyle(fontSize: 13)),
+                  Expanded(
+                    child: Text(
+                      order.observacao!,
+                      style: const TextStyle(
+                          fontSize: 12, color: Color(0xFF5D4037)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
 
           const Divider(height: 16),
 

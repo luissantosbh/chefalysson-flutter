@@ -35,6 +35,7 @@ class OrderService extends ChangeNotifier {
     required String pixOrderId,
     DeliveryAddress? deliveryAddress,
     String? nomeCliente,
+    String? observacao,
   }) async {
     final ref = FirebaseFirestore.instance.collection('orders').doc();
 
@@ -62,6 +63,8 @@ class OrderService extends ChangeNotifier {
         'deliveryAddress': deliveryAddress.toMap(),
       if (nomeCliente != null && nomeCliente.isNotEmpty)
         'nomeCliente': nomeCliente,
+      if (observacao != null && observacao.isNotEmpty)
+        'observacao': observacao,
     });
 
     return ref.id;
@@ -206,6 +209,7 @@ class OrderService extends ChangeNotifier {
       userId: userId,
       userName: userName,
       nomeCliente: d['nomeCliente'] as String?,
+      observacao: d['observacao'] as String?,
       pixOrderId: pixId,
       items: items,
       total: total,

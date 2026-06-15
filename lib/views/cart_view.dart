@@ -128,6 +128,9 @@ class CartView extends StatelessWidget {
         // Endereço de entrega (resumo ou botão para adicionar)
         _AddressSummaryBar(),
 
+        // Observação
+        _ObservacaoField(),
+
         // Botão PIX
         Container(
           color: Theme.of(context).colorScheme.surface,
@@ -220,6 +223,55 @@ class _AddressSummaryBar extends StatelessWidget {
                 color: Theme.of(context).colorScheme.onSurfaceVariant),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Campo de observação
+// ---------------------------------------------------------------------------
+
+class _ObservacaoField extends StatefulWidget {
+  @override
+  State<_ObservacaoField> createState() => _ObservacaoFieldState();
+}
+
+class _ObservacaoFieldState extends State<_ObservacaoField> {
+  late final TextEditingController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = TextEditingController(
+        text: context.read<CartStore>().observacao);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Theme.of(context).colorScheme.surface,
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      child: TextField(
+        controller: _ctrl,
+        minLines: 3,
+        maxLines: null,
+        maxLength: 140,
+        textCapitalization: TextCapitalization.sentences,
+        keyboardType: TextInputType.multiline,
+        decoration: const InputDecoration(
+          labelText: '💬 Alguma observação?',
+          hintText: 'Ex: sem wasabi, shoyu à parte, alergia a amendoim...',
+          border: OutlineInputBorder(),
+          alignLabelWithHint: true,
+        ),
+        onChanged: (v) => context.read<CartStore>().observacao = v,
       ),
     );
   }

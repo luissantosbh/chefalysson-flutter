@@ -7,6 +7,7 @@ import 'package:chef_alysson/models/menu_item.dart';
 
 class CartStore extends ChangeNotifier {
   final List<CartItem> _items = [];
+  String observacao = '';
 
   List<CartItem> get items => List.unmodifiable(_items);
 
@@ -52,6 +53,7 @@ class CartStore extends ChangeNotifier {
 
   void clear() {
     _items.clear();
+    observacao = '';
     notifyListeners();
   }
 }

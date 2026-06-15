@@ -60,6 +60,7 @@ class _PixCheckoutViewState extends State<PixCheckoutView> {
         pixOrderId: _orderId,
         deliveryAddress: addrService.address,
         nomeCliente: addrService.nomeCliente,
+        observacao: cart.observacao.isNotEmpty ? cart.observacao : null,
       );
       if (mounted) setState(() => _orderConfirmed = true);
     } catch (e) {
