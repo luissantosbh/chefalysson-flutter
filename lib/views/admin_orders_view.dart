@@ -370,20 +370,32 @@ $itensList$obsLine
           // Botão motoqueiro — apenas quando "Pronto para entrega"
           if (isReadyToDeliver) ...[
             const SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: () => Share.share(_buildMotoboyText()),
-                icon: const Text('🛵', style: TextStyle(fontSize: 16)),
-                label: const Text('Enviar para Motoqueiro',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 13)),
-                style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFFE67E22),
-                  foregroundColor: Colors.white,
-                  visualDensity: VisualDensity.compact,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
+            Builder(
+              builder: (btnCtx) => SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () async {
+                    final box =
+                        btnCtx.findRenderObject() as RenderBox?;
+                    final origin = box != null
+                        ? box.localToGlobal(Offset.zero) & box.size
+                        : Rect.fromLTWH(0, 0, 10, 10);
+                    await Share.share(
+                      _buildMotoboyText(),
+                      sharePositionOrigin: origin,
+                    );
+                  },
+                  icon: const Text('🛵', style: TextStyle(fontSize: 16)),
+                  label: const Text('Enviar para Motoqueiro',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 13)),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFFE67E22),
+                    foregroundColor: Colors.white,
+                    visualDensity: VisualDensity.compact,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
                 ),
               ),
             ),
