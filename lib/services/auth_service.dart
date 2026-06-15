@@ -132,6 +132,8 @@ class AuthService extends ChangeNotifier {
       final rawNonce = _randomNonce();
       final hashedNonce = _sha256(rawNonce);
 
+      debugPrint('[Apple] Iniciando — rawNonce length: ${rawNonce.length}');
+
       final appleCredential = await SignInWithApple.getAppleIDCredential(
         scopes: [
           AppleIDAuthorizationScopes.email,
@@ -140,13 +142,34 @@ class AuthService extends ChangeNotifier {
         nonce: hashedNonce,
       );
 
+      debugPrint('[Apple] Credencial recebida da Apple');
+      debugPrint('[Apple] userIdentifier: ${appleCredential.userIdentifier}');
+      debugPrint('[Apple] email: ${appleCredential.email}');
+      debugPrint('[Apple] givenName: ${appleCredential.givenName}');
+      debugPrint(
+          '[Apple] identityToken null? ${appleCredential.identityToken == null}');
+      debugPrint(
+          '[Apple] authorizationCode null? ${appleCredential.authorizationCode == null}');
+
+      final identityToken = appleCredential.identityToken;
+      if (identityToken == null) {
+        _errorMessage =
+            'Apple não retornou identity token. Tente novamente.';
+        notifyListeners();
+        return;
+      }
+
       final oauthCredential = OAuthProvider('apple.com').credential(
-        idToken: appleCredential.identityToken,
+        idToken: identityToken,
         rawNonce: rawNonce,
       );
 
+      debugPrint('[Apple] Enviando para Firebase...');
+
       final authResult =
           await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+
+      debugPrint('[Apple] Firebase OK — uid: ${authResult.user?.uid}');
 
       final givenName = appleCredential.givenName ?? '';
       final familyName = appleCredential.familyName ?? '';
@@ -163,12 +186,20 @@ class AuthService extends ChangeNotifier {
       _errorMessage = null;
       notifyListeners();
     } on SignInWithAppleAuthorizationException catch (e) {
+      debugPrint('[Apple] Erro Apple — code: ${e.code}, msg: ${e.message}');
       if (e.code != AuthorizationErrorCode.canceled) {
-        _errorMessage = 'Falha no login com Apple: ${e.message}';
+        _errorMessage = 'Falha no login com Apple (${e.code}): ${e.message}';
         notifyListeners();
       }
+    } on FirebaseAuthException catch (e) {
+      debugPrint(
+          '[Apple] Erro Firebase — code: ${e.code}, msg: ${e.message}');
+      _errorMessage =
+          'Erro Firebase [${e.code}]: ${e.message}';
+      notifyListeners();
     } catch (e) {
-      _errorMessage = 'Falha na autenticação Firebase: $e';
+      debugPrint('[Apple] Erro inesperado: $e');
+      _errorMessage = 'Erro inesperado: $e';
       notifyListeners();
     }
   }
