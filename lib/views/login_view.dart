@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:chef_alysson/services/auth_service.dart';
 
 class LoginView extends StatelessWidget {
@@ -88,13 +89,13 @@ class LoginView extends StatelessWidget {
                     ),
                     const SizedBox(height: 14),
 
-                    // Apple
-                    _LoginButton(
-                      icon: const Icon(Icons.apple_rounded, size: 22),
-                      label: 'Continuar com Apple',
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
-                      onTap: () => context.read<AuthService>().signInWithApple(),
+                    // Apple — botão nativo obrigatório pela App Store (Guideline 2.1a)
+                    SignInWithAppleButton(
+                      onPressed: () =>
+                          context.read<AuthService>().signInWithApple(),
+                      style: SignInWithAppleButtonStyle.white,
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(14)),
                     ),
                     const SizedBox(height: 14),
 
