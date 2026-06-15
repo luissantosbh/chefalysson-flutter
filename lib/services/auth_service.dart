@@ -1,17 +1,12 @@
 // services/auth_service.dart
 // Equivalente a AuthService.swift
-// Firebase Auth com Google, Apple e modo convidado (anônimo).
+// Firebase Auth com Google e modo convidado (anônimo).
 
-import 'dart:convert';
-import 'dart:math';
-
-import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import 'package:chef_alysson/models/app_user.dart';
 
@@ -73,7 +68,7 @@ class AuthService extends ChangeNotifier {
           provider: AuthProvider.google,
         );
       } else {
-        // Apple ou outro provider
+        // Sessão Firebase sem Google — trata como convidado
         _user = AppUser(
           id: firebaseUser.uid,
           name: firebaseUser.displayName ?? 'Cliente',
@@ -81,7 +76,7 @@ class AuthService extends ChangeNotifier {
           photoURL: firebaseUser.photoURL != null
               ? Uri.tryParse(firebaseUser.photoURL!)
               : null,
-          provider: AuthProvider.apple,
+          provider: AuthProvider.google,
         );
       }
       notifyListeners();
@@ -119,87 +114,6 @@ class AuthService extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       _errorMessage = 'Falha no login com Google: $e';
-      notifyListeners();
-    }
-  }
-
-  // -------------------------------------------------------------------------
-  // Apple
-  // -------------------------------------------------------------------------
-
-  Future<void> signInWithApple() async {
-    try {
-      final rawNonce = _randomNonce();
-      final hashedNonce = _sha256(rawNonce);
-
-      debugPrint('[Apple] Iniciando — rawNonce length: ${rawNonce.length}');
-
-      final appleCredential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-        nonce: hashedNonce,
-      );
-
-      debugPrint('[Apple] Credencial recebida da Apple');
-      debugPrint('[Apple] userIdentifier: ${appleCredential.userIdentifier}');
-      debugPrint('[Apple] email: ${appleCredential.email}');
-      debugPrint('[Apple] givenName: ${appleCredential.givenName}');
-      debugPrint(
-          '[Apple] identityToken null? ${appleCredential.identityToken == null}');
-      debugPrint(
-          '[Apple] authorizationCode null? ${appleCredential.authorizationCode == null}');
-
-      final identityToken = appleCredential.identityToken;
-      if (identityToken == null) {
-        _errorMessage =
-            'Apple não retornou identity token. Tente novamente.';
-        notifyListeners();
-        return;
-      }
-
-      final oauthCredential = OAuthProvider('apple.com').credential(
-        idToken: identityToken,
-        rawNonce: rawNonce,
-      );
-
-      debugPrint('[Apple] Enviando para Firebase...');
-
-      final authResult =
-          await FirebaseAuth.instance.signInWithCredential(oauthCredential);
-
-      debugPrint('[Apple] Firebase OK — uid: ${authResult.user?.uid}');
-
-      final givenName = appleCredential.givenName ?? '';
-      final familyName = appleCredential.familyName ?? '';
-      final fullName = '$givenName $familyName'.trim();
-
-      _user = AppUser(
-        id: authResult.user!.uid,
-        name: fullName.isNotEmpty
-            ? fullName
-            : (authResult.user!.displayName ?? 'Cliente'),
-        email: appleCredential.email ?? authResult.user!.email ?? '',
-        provider: AuthProvider.apple,
-      );
-      _errorMessage = null;
-      notifyListeners();
-    } on SignInWithAppleAuthorizationException catch (e) {
-      debugPrint('[Apple] Erro Apple — code: ${e.code}, msg: ${e.message}');
-      if (e.code != AuthorizationErrorCode.canceled) {
-        _errorMessage = 'Falha no login com Apple (${e.code}): ${e.message}';
-        notifyListeners();
-      }
-    } on FirebaseAuthException catch (e) {
-      debugPrint(
-          '[Apple] Erro Firebase — code: ${e.code}, msg: ${e.message}');
-      _errorMessage =
-          'Erro Firebase [${e.code}]: ${e.message}';
-      notifyListeners();
-    } catch (e) {
-      debugPrint('[Apple] Erro inesperado: $e');
-      _errorMessage = 'Erro inesperado: $e';
       notifyListeners();
     }
   }
@@ -271,22 +185,5 @@ class AuthService extends ChangeNotifier {
   void clearError() {
     _errorMessage = null;
     notifyListeners();
-  }
-
-  // -------------------------------------------------------------------------
-  // Helpers criptográficos (Apple Sign In)
-  // -------------------------------------------------------------------------
-
-  String _randomNonce({int length = 32}) {
-    const charset =
-        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
-    final random = Random.secure();
-    return List.generate(length, (_) => charset[random.nextInt(charset.length)])
-        .join();
-  }
-
-  String _sha256(String input) {
-    final bytes = utf8.encode(input);
-    return sha256.convert(bytes).toString();
   }
 }

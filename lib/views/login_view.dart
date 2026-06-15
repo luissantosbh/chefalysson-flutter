@@ -3,7 +3,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:chef_alysson/services/auth_service.dart';
 
 class LoginView extends StatelessWidget {
@@ -68,7 +67,7 @@ class LoginView extends StatelessWidget {
                       'Comida japonesa fresquinha na sua casa',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.white.withOpacity(0.85),
+                        color: Colors.white.withValues(alpha: 0.85),
                       ),
                     ),
                   ],
@@ -89,16 +88,6 @@ class LoginView extends StatelessWidget {
                     ),
                     const SizedBox(height: 14),
 
-                    // Apple — botão nativo obrigatório pela App Store (Guideline 2.1a)
-                    SignInWithAppleButton(
-                      onPressed: () =>
-                          context.read<AuthService>().signInWithApple(),
-                      style: SignInWithAppleButtonStyle.white,
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(14)),
-                    ),
-                    const SizedBox(height: 14),
-
                     // Convidado
                     TextButton(
                       onPressed: () =>
@@ -107,9 +96,9 @@ class LoginView extends StatelessWidget {
                         'Continuar sem cadastro',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                           decoration: TextDecoration.underline,
-                          decorationColor: Colors.white.withOpacity(0.9),
+                          decorationColor: Colors.white.withValues(alpha: 0.9),
                         ),
                       ),
                     ),
@@ -126,7 +115,7 @@ class LoginView extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 11,
-                      color: Colors.white.withOpacity(0.6),
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
                 ),
