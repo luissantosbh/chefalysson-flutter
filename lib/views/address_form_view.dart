@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:chef_alysson/models/address.dart';
+import 'package:chef_alysson/models/app_user.dart';
 import 'package:chef_alysson/services/address_service.dart';
 import 'package:chef_alysson/services/auth_service.dart';
 
@@ -21,8 +22,13 @@ class AddressFormView extends StatefulWidget {
 class _AddressFormViewState extends State<AddressFormView> {
   final _formKey = GlobalKey<FormState>();
 
+  static const _cidades = ['Belo Horizonte (MG)', 'Contagem (MG)'];
+
+  late String _cidadeSelecionada;
+  late final bool _isGuest;
+
+  late final TextEditingController _nome;
   late final TextEditingController _telefone;
-  late final TextEditingController _cidade;
   late final TextEditingController _bairro;
   late final TextEditingController _rua;
   late final TextEditingController _numero;
@@ -33,9 +39,18 @@ class _AddressFormViewState extends State<AddressFormView> {
   @override
   void initState() {
     super.initState();
+    _isGuest =
+        context.read<AuthService>().user?.provider == AuthProvider.guest;
+
     final existing = context.read<AddressService>().address;
+
+    final cidadeExistente = existing?.cidade ?? '';
+    _cidadeSelecionada = _cidades.contains(cidadeExistente)
+        ? cidadeExistente
+        : _cidades.first;
+
+    _nome = TextEditingController();
     _telefone = TextEditingController(text: existing?.telefone ?? '');
-    _cidade = TextEditingController(text: existing?.cidade ?? '');
     _bairro = TextEditingController(text: existing?.bairro ?? '');
     _rua = TextEditingController(text: existing?.rua ?? '');
     _numero = TextEditingController(text: existing?.numero ?? '');
@@ -44,8 +59,8 @@ class _AddressFormViewState extends State<AddressFormView> {
 
   @override
   void dispose() {
+    _nome.dispose();
     _telefone.dispose();
-    _cidade.dispose();
     _bairro.dispose();
     _rua.dispose();
     _numero.dispose();
@@ -63,7 +78,7 @@ class _AddressFormViewState extends State<AddressFormView> {
 
     final address = DeliveryAddress(
       telefone: _telefone.text.trim(),
-      cidade: _cidade.text.trim(),
+      cidade: _cidadeSelecionada,
       bairro: _bairro.text.trim(),
       rua: _rua.text.trim(),
       numero: _numero.text.trim(),
@@ -71,7 +86,11 @@ class _AddressFormViewState extends State<AddressFormView> {
     );
 
     try {
-      await context.read<AddressService>().save(userId, address);
+      await context.read<AddressService>().save(
+            userId,
+            address,
+            nomeCliente: _isGuest ? _nome.text.trim() : null,
+          );
       if (mounted) {
         Navigator.pop(context);
         widget.onSaved?.call();
@@ -103,6 +122,19 @@ class _AddressFormViewState extends State<AddressFormView> {
               style: TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 24),
+
+            // Nome — apenas para convidados
+            if (_isGuest) ...[
+              _field(
+                controller: _nome,
+                label: 'Nome',
+                icon: Icons.person_rounded,
+                required: true,
+                validatorMsg: 'Por favor, informe seu nome',
+              ),
+              const SizedBox(height: 16),
+            ],
+
             _field(
               controller: _telefone,
               label: 'Telefone / WhatsApp',
@@ -112,13 +144,28 @@ class _AddressFormViewState extends State<AddressFormView> {
               textCapitalization: TextCapitalization.none,
             ),
             const SizedBox(height: 16),
-            _field(
-              controller: _cidade,
-              label: 'Cidade',
-              icon: Icons.location_city_rounded,
-              required: true,
+
+            // Cidade — picker fixo com BH e Contagem
+            DropdownButtonFormField<String>(
+              initialValue: _cidadeSelecionada,
+              decoration: InputDecoration(
+                labelText: 'Cidade *',
+                prefixIcon:
+                    const Icon(Icons.location_city_rounded, size: 20),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 14),
+              ),
+              items: _cidades
+                  .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                  .toList(),
+              onChanged: (v) {
+                if (v != null) _cidadeSelecionada = v;
+              },
             ),
             const SizedBox(height: 16),
+
             _field(
               controller: _bairro,
               label: 'Bairro',
@@ -194,6 +241,7 @@ class _AddressFormViewState extends State<AddressFormView> {
     required bool required,
     TextInputType? keyboardType,
     TextCapitalization textCapitalization = TextCapitalization.words,
+    String? validatorMsg,
   }) {
     return TextFormField(
       controller: controller,
@@ -207,8 +255,9 @@ class _AddressFormViewState extends State<AddressFormView> {
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
       validator: required
-          ? (v) =>
-              (v == null || v.trim().isEmpty) ? 'Preencha o $label' : null
+          ? (v) => (v == null || v.trim().isEmpty)
+              ? (validatorMsg ?? 'Preencha o $label')
+              : null
           : null,
     );
   }

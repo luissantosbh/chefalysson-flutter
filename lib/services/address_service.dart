@@ -34,11 +34,16 @@ class AddressService extends ChangeNotifier {
     }
   }
 
-  Future<void> save(String userId, DeliveryAddress address) async {
+  Future<void> save(String userId, DeliveryAddress address,
+      {String? nomeCliente}) async {
+    final Map<String, dynamic> data = {'deliveryAddress': address.toMap()};
+    if (nomeCliente != null && nomeCliente.isNotEmpty) {
+      data['nomeCliente'] = nomeCliente;
+    }
     await FirebaseFirestore.instance
         .collection('users')
         .doc(userId)
-        .set({'deliveryAddress': address.toMap()}, SetOptions(merge: true));
+        .set(data, SetOptions(merge: true));
     _address = address;
     notifyListeners();
   }
