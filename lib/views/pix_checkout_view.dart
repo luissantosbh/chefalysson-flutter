@@ -52,13 +52,14 @@ class _PixCheckoutViewState extends State<PixCheckoutView> {
     });
 
     try {
-      final address = context.read<AddressService>().address;
+      final addrService = context.read<AddressService>();
       await orders.createOrder(
         userId: auth.user!.id,
         userName: auth.user!.name,
         cartItems: cart.items,
         pixOrderId: _orderId,
-        deliveryAddress: address,
+        deliveryAddress: addrService.address,
+        nomeCliente: addrService.nomeCliente,
       );
       if (mounted) setState(() => _orderConfirmed = true);
     } catch (e) {

@@ -1,6 +1,7 @@
 // models/address.dart
 
 class DeliveryAddress {
+  final String cep;
   final String cidade;
   final String bairro;
   final String rua;
@@ -9,6 +10,7 @@ class DeliveryAddress {
   final String telefone;
 
   const DeliveryAddress({
+    this.cep = '',
     required this.cidade,
     required this.bairro,
     required this.rua,
@@ -18,6 +20,7 @@ class DeliveryAddress {
   });
 
   Map<String, dynamic> toMap() => {
+        'cep': cep,
         'cidade': cidade,
         'bairro': bairro,
         'rua': rua,
@@ -27,6 +30,7 @@ class DeliveryAddress {
       };
 
   factory DeliveryAddress.fromMap(Map<String, dynamic> m) => DeliveryAddress(
+        cep: m['cep'] as String? ?? '',
         cidade: m['cidade'] as String? ?? '',
         bairro: m['bairro'] as String? ?? '',
         rua: m['rua'] as String? ?? '',

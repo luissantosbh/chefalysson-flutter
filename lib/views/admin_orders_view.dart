@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'package:chef_alysson/models/order.dart';
 import 'package:chef_alysson/services/order_service.dart';
@@ -198,9 +199,40 @@ class _AdminOrderCard extends StatelessWidget {
   final Order order;
   const _AdminOrderCard({required this.order});
 
+  String _buildMotoboyText() {
+    final addr = order.deliveryAddress;
+    final nome = order.nomeCliente ?? order.userName;
+
+    final enderecoLines = addr == null
+        ? '   (endereço não informado)'
+        : [
+            '   ${addr.rua}, ${addr.numero}${addr.complemento.isNotEmpty ? ' ${addr.complemento}' : ''}',
+            '   ${addr.bairro}, ${addr.cidade}',
+            if (addr.cep.isNotEmpty) '   CEP: ${addr.cep}',
+            '   📞 ${addr.telefone}',
+          ].join('\n');
+
+    final itensList = order.items
+        .map((i) => '   ${i.quantity}× ${i.name}')
+        .join('\n');
+
+    return '''🛵 *Novo pedido para entrega*
+
+👤 *Cliente:* $nome
+📍 *Endereço:*
+$enderecoLines
+
+🍣 *Pedido:*
+$itensList
+
+💰 *Total:* ${order.totalFormatted}
+💳 *Pagamento:* PIX''';
+  }
+
   @override
   Widget build(BuildContext context) {
     final next = order.status.next;
+    final isReadyToDeliver = order.status == OrderStatus.pronto;
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -300,6 +332,28 @@ class _AdminOrderCard extends StatelessWidget {
                 ),
             ],
           ),
+
+          // Botão motoqueiro — apenas quando "Pronto para entrega"
+          if (isReadyToDeliver) ...[
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () => Share.share(_buildMotoboyText()),
+                icon: const Text('🛵', style: TextStyle(fontSize: 16)),
+                label: const Text('Enviar para Motoqueiro',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 13)),
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFFE67E22),
+                  foregroundColor: Colors.white,
+                  visualDensity: VisualDensity.compact,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

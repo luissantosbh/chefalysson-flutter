@@ -115,6 +115,7 @@ class Order {
   final String id;
   final String userId;
   final String userName;
+  final String? nomeCliente;
   final String pixOrderId;
   final List<OrderLineItem> items;
   final double total;
@@ -126,6 +127,7 @@ class Order {
     required this.id,
     required this.userId,
     required this.userName,
+    this.nomeCliente,
     required this.pixOrderId,
     required this.items,
     required this.total,

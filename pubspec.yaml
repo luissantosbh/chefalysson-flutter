@@ -33,6 +33,12 @@ dependencies:
   # Clipboard (Pix copia e cola)
   # já incluso no Flutter via Clipboard.setData
 
+  # HTTP para ViaCEP
+  http: ^1.2.0
+
+  # Compartilhamento nativo (Share Sheet)
+  share_plus: ^10.0.0
+
   cupertino_icons: ^1.0.8
 
 dev_dependencies:

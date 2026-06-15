@@ -7,9 +7,11 @@ import 'package:chef_alysson/models/address.dart';
 
 class AddressService extends ChangeNotifier {
   DeliveryAddress? _address;
+  String? _nomeCliente;
   bool _isLoading = false;
 
   DeliveryAddress? get address => _address;
+  String? get nomeCliente => _nomeCliente;
   bool get isLoading => _isLoading;
   bool get hasAddress => _address != null && _address!.isValid;
 
@@ -26,6 +28,7 @@ class AddressService extends ChangeNotifier {
       if (raw is Map<String, dynamic>) {
         _address = DeliveryAddress.fromMap(raw);
       }
+      _nomeCliente = data?['nomeCliente'] as String?;
     } catch (_) {
       // Silently ignore load errors — user will be prompted to fill in
     } finally {
