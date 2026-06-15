@@ -48,6 +48,9 @@ class AddressService extends ChangeNotifier {
         .doc(userId)
         .set(data, SetOptions(merge: true));
     _address = address;
+    if (nomeCliente != null && nomeCliente.isNotEmpty) {
+      _nomeCliente = nomeCliente;
+    }
     notifyListeners();
   }
 

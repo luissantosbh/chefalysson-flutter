@@ -201,7 +201,11 @@ class _AdminOrderCard extends StatelessWidget {
 
   String _buildMotoboyText() {
     final addr = order.deliveryAddress;
-    final nome = order.nomeCliente ?? order.userName;
+    final nomeRaw = order.nomeCliente?.isNotEmpty == true
+        ? order.nomeCliente!
+        : order.userName;
+    final nome =
+        (nomeRaw == 'Convidado' || nomeRaw.isEmpty) ? 'Cliente' : nomeRaw;
 
     final enderecoLines = addr == null
         ? '   (endereço não informado)'
