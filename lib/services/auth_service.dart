@@ -160,12 +160,18 @@ class AuthService extends ChangeNotifier {
       final familyName = appleCredential.familyName ?? '';
       final fullName = '$givenName $familyName'.trim();
 
+      // Apple só envia o nome no primeiro login — persiste no Firebase Auth
+      final firebaseUser = authResult.user!;
+      if (fullName.isNotEmpty && firebaseUser.displayName == null) {
+        await firebaseUser.updateDisplayName(fullName);
+      }
+
       _user = AppUser(
-        id: authResult.user!.uid,
+        id: firebaseUser.uid,
         name: fullName.isNotEmpty
             ? fullName
-            : (authResult.user!.displayName ?? 'Cliente'),
-        email: appleCredential.email ?? authResult.user!.email ?? '',
+            : (firebaseUser.displayName ?? 'Cliente'),
+        email: appleCredential.email ?? firebaseUser.email ?? '',
         provider: AuthProvider.apple,
       );
       _errorMessage = null;

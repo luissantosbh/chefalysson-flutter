@@ -96,7 +96,7 @@ class LoginView extends StatelessWidget {
                       SignInWithAppleButton(
                         onPressed: () =>
                             context.read<AuthService>().signInWithApple(),
-                        style: SignInWithAppleButtonStyle.white,
+                        style: SignInWithAppleButtonStyle.black,
                         borderRadius:
                             const BorderRadius.all(Radius.circular(14)),
                       ),
