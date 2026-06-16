@@ -199,13 +199,16 @@ class _AdminOrderCard extends StatelessWidget {
   final Order order;
   const _AdminOrderCard({required this.order});
 
-  String _buildMotoboyText() {
-    final addr = order.deliveryAddress;
-    final nomeRaw = order.nomeCliente?.isNotEmpty == true
+  String _nome() {
+    final raw = order.nomeCliente?.isNotEmpty == true
         ? order.nomeCliente!
         : order.userName;
-    final nome =
-        (nomeRaw == 'Convidado' || nomeRaw.isEmpty) ? 'Cliente' : nomeRaw;
+    return (raw == 'Convidado' || raw.isEmpty) ? 'Cliente' : raw;
+  }
+
+  String _buildWhatsappText() {
+    final addr = order.deliveryAddress;
+    final nome = _nome();
 
     final enderecoLines = addr == null
         ? '   (endereço não informado)'
@@ -236,6 +239,47 @@ $itensList$obsLine
 
 💰 *Total:* ${order.totalFormatted}
 💳 *Pagamento:* PIX''';
+  }
+
+  String _buildPrintText() {
+    final addr = order.deliveryAddress;
+    final nome = _nome();
+    final obs = order.observacao;
+
+    final buf = StringBuffer();
+    buf.writeln('================================');
+    buf.writeln('   NOVO PEDIDO PARA ENTREGA');
+    buf.writeln('================================');
+    buf.writeln('CLIENTE: $nome');
+    if (addr != null && addr.telefone.isNotEmpty) {
+      buf.writeln('TELEFONE: ${addr.telefone}');
+    }
+    buf.writeln();
+    if (addr != null) {
+      buf.writeln('ENDERECO:');
+      final comp =
+          addr.complemento.isNotEmpty ? ' ${addr.complemento}' : '';
+      buf.writeln('${addr.rua}, ${addr.numero}$comp');
+      buf.writeln('${addr.bairro}, ${addr.cidade} (MG)');
+      if (addr.cep.isNotEmpty) buf.writeln('CEP: ${addr.cep}');
+    } else {
+      buf.writeln('ENDERECO: (nao informado)');
+    }
+    buf.writeln();
+    buf.writeln('--------------------------------');
+    buf.writeln('PEDIDO:');
+    for (final item in order.items) {
+      buf.writeln('${item.quantity}x ${item.name}');
+    }
+    if (obs != null && obs.isNotEmpty) {
+      buf.writeln();
+      buf.writeln('OBSERVACAO: $obs');
+    }
+    buf.writeln('--------------------------------');
+    buf.writeln('TOTAL: ${order.totalFormatted}');
+    buf.writeln('PAGAMENTO: PIX');
+    buf.write('================================');
+    return buf.toString();
   }
 
   @override
@@ -371,37 +415,60 @@ $itensList$obsLine
             ],
           ),
 
-          // Botão motoqueiro — apenas quando "Pronto para entrega"
+          // Botões motoqueiro — apenas quando "Pronto para entrega"
           if (isReadyToDeliver) ...[
             const SizedBox(height: 10),
             Builder(
-              builder: (btnCtx) => SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: () async {
-                    final box =
-                        btnCtx.findRenderObject() as RenderBox?;
-                    final origin = box != null
-                        ? box.localToGlobal(Offset.zero) & box.size
-                        : const Rect.fromLTWH(0, 0, 10, 10);
-                    await Share.share(
-                      _buildMotoboyText(),
-                      sharePositionOrigin: origin,
-                    );
-                  },
-                  icon: const Text('🛵', style: TextStyle(fontSize: 16)),
-                  label: const Text('Enviar para Motoqueiro',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 13)),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFFE67E22),
-                    foregroundColor: Colors.white,
-                    visualDensity: VisualDensity.compact,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                  ),
-                ),
-              ),
+              builder: (btnCtx) {
+                Future<void> share(String text) async {
+                  final box = btnCtx.findRenderObject() as RenderBox?;
+                  final origin = box != null
+                      ? box.localToGlobal(Offset.zero) & box.size
+                      : const Rect.fromLTWH(0, 0, 10, 10);
+                  await Share.share(text, sharePositionOrigin: origin);
+                }
+
+                return Row(
+                  children: [
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: () => share(_buildWhatsappText()),
+                        icon: const Text('📱',
+                            style: TextStyle(fontSize: 14)),
+                        label: const Text('WhatsApp',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13)),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color(0xFFE67E22),
+                          foregroundColor: Colors.white,
+                          visualDensity: VisualDensity.compact,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: () => share(_buildPrintText()),
+                        icon: const Icon(Icons.print_rounded, size: 16),
+                        label: const Text('Imprimir',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13)),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color(0xFF37474F),
+                          foregroundColor: Colors.white,
+                          visualDensity: VisualDensity.compact,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ],
