@@ -19,7 +19,6 @@ dependencies:
   # Auth Social
   google_sign_in: ^6.2.0
   sign_in_with_apple: ^6.0.0
-  crypto: ^3.0.3           # SHA-256 para Apple Sign In
 
   # Estado
   provider: ^6.1.2

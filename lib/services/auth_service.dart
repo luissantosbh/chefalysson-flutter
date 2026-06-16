@@ -2,16 +2,11 @@
 // Equivalente a AuthService.swift
 // Firebase Auth com Google, Apple e modo convidado (anônimo).
 
-import 'dart:convert';
-import 'dart:math';
-
-import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import 'package:chef_alysson/models/app_user.dart';
 
@@ -129,62 +124,36 @@ class AuthService extends ChangeNotifier {
 
   Future<void> signInWithApple() async {
     try {
-      final rawNonce = _randomNonce();
-      final hashedNonce = _sha256(rawNonce);
+      final appleProvider = AppleAuthProvider();
+      appleProvider.addScope('email');
+      appleProvider.addScope('name');
 
-      final appleCredential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-        nonce: hashedNonce,
-      );
+      final userCredential =
+          await FirebaseAuth.instance.signInWithProvider(appleProvider);
 
-      final identityToken = appleCredential.identityToken;
-      if (identityToken == null) {
-        _errorMessage =
-            'Apple não retornou identity token. Tente novamente.';
-        notifyListeners();
-        return;
-      }
+      debugPrint('[Apple] Login ok: ${userCredential.user?.email}');
 
-      final oauthCredential = OAuthProvider('apple.com').credential(
-        idToken: identityToken,
-        rawNonce: rawNonce,
-      );
-
-      final authResult =
-          await FirebaseAuth.instance.signInWithCredential(oauthCredential);
-
-      final givenName = appleCredential.givenName ?? '';
-      final familyName = appleCredential.familyName ?? '';
-      final fullName = '$givenName $familyName'.trim();
-
-      // Apple só envia o nome no primeiro login — persiste no Firebase Auth
-      final firebaseUser = authResult.user!;
-      if (fullName.isNotEmpty && firebaseUser.displayName == null) {
-        await firebaseUser.updateDisplayName(fullName);
-      }
+      final firebaseUser = userCredential.user!;
+      final profileName =
+          userCredential.additionalUserInfo?.profile?['name'] as String?;
 
       _user = AppUser(
         id: firebaseUser.uid,
-        name: fullName.isNotEmpty
-            ? fullName
-            : (firebaseUser.displayName ?? 'Cliente'),
-        email: appleCredential.email ?? firebaseUser.email ?? '',
+        name: firebaseUser.displayName ?? profileName ?? 'Cliente',
+        email: firebaseUser.email ?? '',
         provider: AuthProvider.apple,
       );
       _errorMessage = null;
       notifyListeners();
-    } on SignInWithAppleAuthorizationException catch (e) {
-      if (e.code != AuthorizationErrorCode.canceled) {
-        _errorMessage = 'Falha no login com Apple (${e.code}): ${e.message}';
+    } on FirebaseAuthException catch (e) {
+      debugPrint('[Apple] FirebaseAuthException — code: ${e.code}, '
+          'message: ${e.message}, credential: ${e.credential}');
+      if (e.code != 'canceled' && e.code != 'web-context-canceled') {
+        _errorMessage = 'Erro Firebase [${e.code}]: ${e.message}';
         notifyListeners();
       }
-    } on FirebaseAuthException catch (e) {
-      _errorMessage = 'Erro Firebase [${e.code}]: ${e.message}';
-      notifyListeners();
     } catch (e) {
+      debugPrint('[Apple] Erro: $e');
       _errorMessage = 'Erro inesperado: $e';
       notifyListeners();
     }
@@ -257,22 +226,5 @@ class AuthService extends ChangeNotifier {
   void clearError() {
     _errorMessage = null;
     notifyListeners();
-  }
-
-  // -------------------------------------------------------------------------
-  // Helpers criptográficos (Apple Sign In)
-  // -------------------------------------------------------------------------
-
-  String _randomNonce({int length = 32}) {
-    const charset =
-        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
-    final random = Random.secure();
-    return List.generate(length, (_) => charset[random.nextInt(charset.length)])
-        .join();
-  }
-
-  String _sha256(String input) {
-    final bytes = utf8.encode(input);
-    return sha256.convert(bytes).toString();
   }
 }
