@@ -1,13 +1,15 @@
 // models/app_user.dart
 // Equivalente a AppUser + AuthProvider de Models.swift
 
-enum AuthProvider { google, guest }
+enum AuthProvider { google, apple, guest }
 
 extension AuthProviderLabel on AuthProvider {
   String get label {
     switch (this) {
       case AuthProvider.google:
         return 'Google';
+      case AuthProvider.apple:
+        return 'Apple';
       case AuthProvider.guest:
         return 'Convidado';
     }
