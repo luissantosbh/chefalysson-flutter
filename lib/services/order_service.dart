@@ -173,7 +173,9 @@ class OrderService extends ChangeNotifier {
         userName == null ||
         pixId == null ||
         total == null ||
-        statusRaw == null) return null;
+        statusRaw == null) {
+      return null;
+    }
 
     final status = OrderStatus.fromRaw(statusRaw);
     if (status == null) return null;

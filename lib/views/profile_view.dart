@@ -87,7 +87,7 @@ class ProfileView extends StatelessWidget {
           ),
 
           // Minha conta
-          _SectionHeader(label: 'Minha conta'),
+          const _SectionHeader(label: 'Minha conta'),
           _Section(
             children: [
               ListTile(
@@ -105,20 +105,20 @@ class ProfileView extends StatelessWidget {
           ),
 
           // Info da loja
-          _SectionHeader(label: 'Chef Alysson'),
-          _Section(
+          const _SectionHeader(label: 'Chef Alysson'),
+          const _Section(
             children: [
-              const ListTile(
+              ListTile(
                 leading: Icon(Icons.access_time_rounded),
                 title: Text('Seg a Dom • 18h30 às 23h30'),
                 dense: true,
               ),
-              const ListTile(
+              ListTile(
                 leading: Icon(Icons.pedal_bike_rounded),
                 title: Text('Entrega em Belo Horizonte e região'),
                 dense: true,
               ),
-              const ListTile(
+              ListTile(
                 leading: Icon(Icons.qr_code_rounded),
                 title: Text('Pagamento via PIX'),
                 dense: true,
@@ -127,7 +127,7 @@ class ProfileView extends StatelessWidget {
           ),
 
           // Sair
-          _SectionHeader(label: ''),
+          const _SectionHeader(label: ''),
           _Section(
             children: [
               ListTile(

@@ -50,7 +50,7 @@ class MenuService extends ChangeNotifier {
       }
       _items = snap.docs
           .map((d) => MenuItem.fromFirestore(
-              d.data() as Map<String, dynamic>, d.id))
+              d.data(), d.id))
           .toList();
       _isLoading = false;
       notifyListeners();

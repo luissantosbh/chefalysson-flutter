@@ -12,7 +12,6 @@ import 'package:chef_alysson/services/auth_service.dart';
 import 'package:chef_alysson/services/cart_store.dart';
 import 'package:chef_alysson/services/menu_service.dart';
 import 'package:chef_alysson/services/order_service.dart';
-import 'package:chef_alysson/views/admin_orders_view.dart';
 import 'package:chef_alysson/views/biografia_view.dart';
 import 'package:chef_alysson/views/cart_view.dart';
 import 'package:chef_alysson/views/login_view.dart';

@@ -315,7 +315,7 @@ class _ProductFormViewState extends State<_ProductFormView> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: DropdownButtonFormField<FoodCategory>(
-                    value: _category,
+                    initialValue: _category,
                     isExpanded: true,
                     decoration: InputDecoration(
                       labelText: 'Categoria',

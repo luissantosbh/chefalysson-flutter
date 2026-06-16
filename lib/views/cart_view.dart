@@ -186,8 +186,8 @@ class _AddressSummaryBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
           color: hasAddr
-              ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.4)
-              : Colors.orange.withOpacity(0.1),
+              ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.4)
+              : Colors.orange.withValues(alpha: 0.1),
           border: Border(
             top: BorderSide(
                 color: hasAddr ? Colors.transparent : Colors.orange.shade200),

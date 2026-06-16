@@ -173,7 +173,7 @@ class _FilterChip extends StatelessWidget {
                     horizontal: 5, vertical: 1),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? Colors.white.withOpacity(0.3)
+                      ? Colors.white.withValues(alpha: 0.3)
                       : Theme.of(context).colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(50),
                 ),
@@ -250,7 +250,7 @@ $itensList$obsLine
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -383,7 +383,7 @@ $itensList$obsLine
                         btnCtx.findRenderObject() as RenderBox?;
                     final origin = box != null
                         ? box.localToGlobal(Offset.zero) & box.size
-                        : Rect.fromLTWH(0, 0, 10, 10);
+                        : const Rect.fromLTWH(0, 0, 10, 10);
                     await Share.share(
                       _buildMotoboyText(),
                       sharePositionOrigin: origin,
