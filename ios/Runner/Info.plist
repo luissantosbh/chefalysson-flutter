@@ -27,7 +27,7 @@
 
 	<!-- Google Sign-In: CLIENT_ID do GoogleService-Info.plist -->
 	<key>GIDClientID</key>
-	<string>3429544640-ij4kdea7t8bvdd8d4qgt5enupcurind2.apps.googleusercontent.com</string>
+	<string>3429544640-k2nl7bhmk9nc4r8p6554438u2jgom29j.apps.googleusercontent.com</string>
 
 	<!-- URL Schemes necessários para Google Sign-In -->
 	<key>CFBundleURLTypes</key>
@@ -37,7 +37,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.3429544640-ij4kdea7t8bvdd8d4qgt5enupcurind2</string>
+				<string>com.googleusercontent.apps.3429544640-k2nl7bhmk9nc4r8p6554438u2jgom29j</string>
 			</array>
 		</dict>
 	</array>
