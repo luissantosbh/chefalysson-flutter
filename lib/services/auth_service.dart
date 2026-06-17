@@ -15,7 +15,8 @@ class AuthService extends ChangeNotifier {
   String? _errorMessage;
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-    serverClientId: "3429544640-rbeq0uhf2gdhpr0ctospmdhflmf5591q.apps.googleusercontent.com",
+    serverClientId:
+        "3429544640-rbeq0uhf2gdhpr0ctospmdhflmf5591q.apps.googleusercontent.com",
   );
 
   AppUser? get user => _user;
@@ -25,7 +26,7 @@ class AuthService extends ChangeNotifier {
   // UIDs com acesso admin
   static const _adminUIDs = {
     '4tHhHjgKQrOz1hPRhh9kziyEueC2', // Luis (developer)
-    // 'UID_DO_ALYSSON',             // Alysson (chef)
+    'fe9NnG39k6QZzrpMwuZf5JM0ZmD3' // Alysson (chef)
   };
   bool get isAdmin => _adminUIDs.contains(_user?.id ?? '');
 
@@ -219,7 +220,6 @@ class AuthService extends ChangeNotifier {
     );
   }
 
-
   // -------------------------------------------------------------------------
   // Excluir conta
   // -------------------------------------------------------------------------
@@ -230,8 +230,14 @@ class AuthService extends ChangeNotifier {
 
     // Remove dados do Firestore
     await FirebaseFirestore.instance.collection('users').doc(uid).delete();
-    await FirebaseFirestore.instance.collection('orders').where('userId', isEqualTo: uid).get().then((snap) {
-      for (var doc in snap.docs) { doc.reference.delete(); }
+    await FirebaseFirestore.instance
+        .collection('orders')
+        .where('userId', isEqualTo: uid)
+        .get()
+        .then((snap) {
+      for (var doc in snap.docs) {
+        doc.reference.delete();
+      }
     });
 
     // Re-autentica e deleta conta Firebase
