@@ -132,6 +132,37 @@ class ProfileView extends StatelessWidget {
             children: [
               ListTile(
                 leading: const Icon(
+                    Icons.delete_forever_rounded,
+                    color: Colors.red),
+                title: const Text('Excluir minha conta',
+                    style: TextStyle(color: Colors.red)),
+                onTap: () async {
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: const Text('Excluir conta'),
+                      content: const Text(
+                          'Tem certeza? Todos os seus dados serão apagados permanentemente.'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx, false),
+                          child: const Text('Cancelar'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx, true),
+                          child: const Text('Excluir',
+                              style: TextStyle(color: Colors.red)),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (confirm == true) {
+                    await auth.deleteAccount();
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(
                     Icons.logout_rounded,
                     color: Colors.red),
                 title: const Text('Sair da conta',

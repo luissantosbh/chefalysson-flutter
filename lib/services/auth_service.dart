@@ -219,6 +219,30 @@ class AuthService extends ChangeNotifier {
     );
   }
 
+
+  // -------------------------------------------------------------------------
+  // Excluir conta
+  // -------------------------------------------------------------------------
+
+  Future<void> deleteAccount() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+
+    // Remove dados do Firestore
+    await FirebaseFirestore.instance.collection('users').doc(uid).delete();
+    await FirebaseFirestore.instance.collection('orders').where('userId', isEqualTo: uid).get().then((snap) {
+      for (var doc in snap.docs) { doc.reference.delete(); }
+    });
+
+    // Re-autentica e deleta conta Firebase
+    await _googleSignIn.signOut();
+    await FirebaseAuth.instance.currentUser?.delete();
+    await FirebaseAuth.instance.signOut();
+
+    _user = null;
+    notifyListeners();
+  }
+
   // -------------------------------------------------------------------------
   // Dismiss error
   // -------------------------------------------------------------------------
