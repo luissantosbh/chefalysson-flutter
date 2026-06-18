@@ -170,7 +170,7 @@ class _PixCheckoutViewState extends State<PixCheckoutView> {
             children: [
               _infoRow('Recebedor', PixPayload.merchantName),
               const SizedBox(height: 6),
-              _infoRow('Chave PIX (celular)', '(31) 98884-8354'),
+              _infoRow('Chave PIX (celular)', '(31) 99398-1310'),
             ],
           ),
         ),
@@ -185,16 +185,17 @@ class _PixCheckoutViewState extends State<PixCheckoutView> {
               if (mounted) setState(() => _copied = false);
             });
           },
-          icon: Icon(_copied ? Icons.check_circle : Icons.copy_rounded,
-              size: 18),
-          label: Text(_copied
-              ? 'Código copiado!'
-              : 'Copiar código PIX (copia e cola)'),
+          icon:
+              Icon(_copied ? Icons.check_circle : Icons.copy_rounded, size: 18),
+          label: Text(
+              _copied ? 'Código copiado!' : 'Copiar código PIX (copia e cola)'),
           style: ElevatedButton.styleFrom(
-            backgroundColor:
-                _copied ? Colors.green : Theme.of(context).colorScheme.surfaceContainerHighest,
-            foregroundColor:
-                _copied ? Colors.white : Theme.of(context).colorScheme.onSurface,
+            backgroundColor: _copied
+                ? Colors.green
+                : Theme.of(context).colorScheme.surfaceContainerHighest,
+            foregroundColor: _copied
+                ? Colors.white
+                : Theme.of(context).colorScheme.onSurface,
             padding: const EdgeInsets.symmetric(vertical: 14),
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -220,8 +221,7 @@ class _PixCheckoutViewState extends State<PixCheckoutView> {
                   child: CircularProgressIndicator(
                       color: Colors.white, strokeWidth: 2.5))
               : const Text('Já fiz o pagamento ✓',
-                  style:
-                      TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         ),
 
         if (_saveError != null) ...[
@@ -251,13 +251,11 @@ class _PixCheckoutViewState extends State<PixCheckoutView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Center(
-              child: Text('🎉', style: TextStyle(fontSize: 72))),
+          const Center(child: Text('🎉', style: TextStyle(fontSize: 72))),
           const SizedBox(height: 18),
           const Text('Pedido recebido!',
               textAlign: TextAlign.center,
-              style:
-                  TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           Text(
             'Obrigado pela preferência! Assim que o PIX for confirmado, começaremos a preparar seu pedido $_orderId.',
@@ -278,8 +276,7 @@ class _PixCheckoutViewState extends State<PixCheckoutView> {
                   borderRadius: BorderRadius.circular(14)),
             ),
             child: const Text('Voltar ao cardápio',
-                style:
-                    TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           ),
         ],
       ),
@@ -293,12 +290,10 @@ class _PixCheckoutViewState extends State<PixCheckoutView> {
   Widget _infoRow(String label, String value) {
     return Row(
       children: [
-        Text(label,
-            style: const TextStyle(fontSize: 12, color: Colors.grey)),
+        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
         const Spacer(),
         Text(value,
-            style: const TextStyle(
-                fontSize: 12, fontWeight: FontWeight.w600)),
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
       ],
     );
   }
