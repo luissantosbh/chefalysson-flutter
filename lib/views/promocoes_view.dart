@@ -1,6 +1,4 @@
 // views/promocoes_view.dart
-// Equivalente a PromocoesView.swift
-
 import 'package:flutter/material.dart';
 
 class _Promo {
@@ -10,10 +8,9 @@ class _Promo {
 }
 
 const _promos = [
-  _Promo('Cardápio completo', 'cardapioPrincipal'),
   _Promo('Combinado Salmão', 'combinadoSalmao'),
-  _Promo('Inauguração', 'inauguracao'),
-  _Promo('Sorteio Barca 50un', 'sorteioBarca'),
+  _Promo('Hot Salmão', 'hotSalmao'),
+  _Promo('Samurai', 'samurai'),
 ];
 
 class PromocoesView extends StatelessWidget {
@@ -34,10 +31,6 @@ class PromocoesView extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Card de promoção
-// ---------------------------------------------------------------------------
-
 class _PromoCard extends StatelessWidget {
   final _Promo promo;
   const _PromoCard({required this.promo});
@@ -50,8 +43,7 @@ class _PromoCard extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 8),
           child: Text(promo.title,
-              style: const TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.bold)),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         ),
         GestureDetector(
           onTap: () => Navigator.push(
@@ -85,14 +77,9 @@ class _PromoCard extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Tela expandida (fullscreen)
-// ---------------------------------------------------------------------------
-
 class _ExpandedPromoView extends StatelessWidget {
   final String imageName;
   final String title;
-
   const _ExpandedPromoView({required this.imageName, required this.title});
 
   @override

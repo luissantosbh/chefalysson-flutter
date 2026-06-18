@@ -170,7 +170,7 @@ class _PixCheckoutViewState extends State<PixCheckoutView> {
             children: [
               _infoRow('Recebedor', PixPayload.merchantName),
               const SizedBox(height: 6),
-              _infoRow('Chave PIX (celular)', '(31) 99398-1310'),
+              _infoRow('Chave PIX (CNPJ)', '22.946.997/0001-00'),
             ],
           ),
         ),
