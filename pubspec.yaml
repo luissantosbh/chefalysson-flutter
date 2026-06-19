@@ -38,6 +38,9 @@ dependencies:
   # Compartilhamento nativo (Share Sheet)
   share_plus: ^10.0.0
 
+  # Som de alerta para admin
+  audioplayers: ^6.0.0
+
   cupertino_icons: ^1.0.8
 
 dev_dependencies:
@@ -51,6 +54,7 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/sounds/
 
 flutter_launcher_icons:
   android: true

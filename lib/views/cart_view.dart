@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'package:chef_alysson/models/cart_item.dart';
 import 'package:chef_alysson/services/address_service.dart';
+import 'package:chef_alysson/services/auth_service.dart';
 import 'package:chef_alysson/services/cart_store.dart';
 import 'package:chef_alysson/views/address_form_view.dart';
 import 'package:chef_alysson/views/pix_checkout_view.dart';
@@ -14,7 +15,41 @@ import 'package:chef_alysson/views/pix_checkout_view.dart';
 // Helpers
 // ---------------------------------------------------------------------------
 
-void _goToCheckout(BuildContext context) {
+Future<void> _goToCheckout(BuildContext context) async {
+  final auth = context.read<AuthService>();
+
+  // Popup de aviso apenas se: não for admin E horário for antes das 18h em BH (UTC-3)
+  final nowBH = DateTime.now().toUtc().subtract(const Duration(hours: 3));
+  final isBefore18h = nowBH.hour < 18;
+
+  if (!auth.isAdmin && isBefore18h) {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Atenção!'),
+        content: const Text(
+          '⏰ Os produtos começam a ser preparados após as 18h '
+          '(horário de Belo Horizonte - MG).\n\n'
+          'Deseja continuar com o pagamento?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Continuar com PIX'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !context.mounted) return;
+  }
+
+  if (!context.mounted) return;
+
   final addrSvc = context.read<AddressService>();
   if (!addrSvc.hasAddress) {
     // Mostra formulário de endereço primeiro; vai para PIX depois de salvar
@@ -138,7 +173,7 @@ class CartView extends StatelessWidget {
           child: SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: () => _goToCheckout(context),
+              onPressed: () { _goToCheckout(context); },
               icon: const Icon(Icons.qr_code_rounded),
               label: Text(
                 'Pagar com PIX • ${cart.totalFormatted}',

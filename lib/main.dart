@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import 'package:chef_alysson/firebase_options.dart';
 import 'package:chef_alysson/services/address_service.dart';
+import 'package:chef_alysson/services/admin_alert_service.dart';
 import 'package:chef_alysson/services/auth_service.dart';
 import 'package:chef_alysson/services/cart_store.dart';
 import 'package:chef_alysson/services/menu_service.dart';
@@ -42,6 +43,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => OrderService()),
         ChangeNotifierProvider(create: (_) => AddressService()),
         ChangeNotifierProvider(create: (_) => MenuService()..startListening()),
+        ChangeNotifierProvider(create: (_) => AdminAlertService()),
       ],
       child: const ChefAlyssonApp(),
     ),
@@ -86,6 +88,7 @@ class RootView extends StatefulWidget {
 
 class _RootViewState extends State<RootView> {
   String? _lastUserId;
+  bool _adminAlertStarted = false;
 
   @override
   Widget build(BuildContext context) {
@@ -102,6 +105,19 @@ class _RootViewState extends State<RootView> {
       _lastUserId = null;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.read<AddressService>().clear();
+      });
+    }
+
+    // Inicia/para o serviço de alerta sonoro conforme o status de admin
+    if (auth.isAdmin && !_adminAlertStarted) {
+      _adminAlertStarted = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<AdminAlertService>().startForAdmin();
+      });
+    } else if (!auth.isAdmin && _adminAlertStarted) {
+      _adminAlertStarted = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<AdminAlertService>().stop();
       });
     }
 

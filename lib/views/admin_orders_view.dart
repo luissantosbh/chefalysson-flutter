@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:chef_alysson/models/order.dart';
+import 'package:chef_alysson/services/admin_alert_service.dart';
 import 'package:chef_alysson/services/order_service.dart';
 import 'package:chef_alysson/views/meus_pedidos_view.dart'; // StatusBadge
 
@@ -23,7 +24,9 @@ class _AdminOrdersViewState extends State<AdminOrdersView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) context.read<OrderService>().startListeningAll();
+      if (!mounted) return;
+      context.read<OrderService>().startListeningAll();
+      context.read<AdminAlertService>().acknowledge();
     });
   }
 
