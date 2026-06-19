@@ -25,7 +25,7 @@ class AuthService extends ChangeNotifier {
 
   // UIDs com acesso admin
   static const _adminUIDs = {
-    '4tHhHjgKQrOz1hPRhh9kziyEueC2', // Luis (developer)
+    'NHpmXu8ujeTi4TcsYwMsw0NdmNj1', // Luis (developer)
     'fe9NnG39k6QZzrpMwuZf5JM0ZmD3' // Alysson (chef)
   };
   bool get isAdmin => _adminUIDs.contains(_user?.id ?? '');
