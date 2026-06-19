@@ -40,6 +40,28 @@ class AdminAlertService extends ChangeNotifier {
 
     _player?.dispose();
     _player = AudioPlayer();
+
+    // Configura para tocar no canal de alarme — ignora modo silencioso
+    // e não depende do volume de mídia
+    try {
+      await _player!.setAudioContext(AudioContext(
+        android: const AudioContextAndroid(
+          audioFocus: AndroidAudioFocus.gainTransientMayDuck,
+          contentType: AndroidContentType.sonification,
+          usageType: AndroidUsageType.alarm,
+          isSpeakerphoneOn: false,
+          stayAwake: false,
+        ),
+        iOS: AudioContextIOS(
+          category: AVAudioSessionCategory.playback,
+          options: const {AVAudioSessionOptions.mixWithOthers},
+        ),
+      ));
+      debugPrint('[AdminAlert] audio context configurado (ALARM)');
+    } catch (e) {
+      debugPrint('[AdminAlert] aviso audio context: $e');
+    }
+
     _player!.onPlayerStateChanged.listen((s) => debugPrint('[AdminAlert] player state: $s'));
     _player!.onLog.listen((m) => debugPrint('[AdminAlert] player log: $m'));
 
@@ -62,10 +84,22 @@ class AdminAlertService extends ChangeNotifier {
   }
 
   void acknowledge() {
-    debugPrint('[AdminAlert] acknowledge() — parando som');
+    debugPrint('[AdminAlert] acknowledge()');
     _hasUnviewedAlerts = false;
     _player?.stop();
     notifyListeners();
+  }
+
+  // Toca o som imediatamente — para teste manual pelo admin
+  Future<void> testSound() async {
+    debugPrint('[AdminAlert] testSound()');
+    if (_player == null) await _init();
+    await _playAlert();
+    // Para após 3s no modo de teste
+    Future.delayed(const Duration(seconds: 3), () {
+      _player?.stop();
+      debugPrint('[AdminAlert] testSound parado');
+    });
   }
 
   Future<void> _poll() async {
@@ -104,7 +138,7 @@ class AdminAlertService extends ChangeNotifier {
     try {
       if (_player == null) await _init();
       if (_alertBytes == null) {
-        debugPrint('[AdminAlert] sem bytes de áudio, abortando');
+        debugPrint('[AdminAlert] sem bytes, abortando');
         return;
       }
       await _player!.play(BytesSource(_alertBytes!));

@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:chef_alysson/services/admin_alert_service.dart';
 import 'package:chef_alysson/services/order_service.dart';
 import 'package:chef_alysson/views/admin_orders_view.dart';
 import 'package:chef_alysson/views/admin_products_view.dart';
@@ -65,6 +66,13 @@ class MaisView extends StatelessWidget {
               context,
               MaterialPageRoute(builder: (_) => const RelatorioView()),
             ),
+          ),
+          const Divider(height: 1, indent: 16, endIndent: 16),
+          ListTile(
+            leading: const Icon(Icons.volume_up_rounded, color: Colors.orange),
+            title: const Text('Testar Som de Alerta'),
+            subtitle: const Text('Toca o alerta por 3 segundos'),
+            onTap: () => context.read<AdminAlertService>().testSound(),
           ),
           const Divider(height: 1, indent: 16, endIndent: 16),
         ],
