@@ -107,15 +107,22 @@ class AdminAlertService extends ChangeNotifier {
     debugPrint('[AdminAlert] poll()...');
 
     try {
-      final snap = await FirebaseFirestore.instance
+      // Alerta em qualquer pedido novo (pendente = iOS antigo, pagamento_confirmado = versão atual)
+      final snapPendente = await FirebaseFirestore.instance
+          .collection('orders')
+          .where('status', isEqualTo: 'pendente')
+          .get();
+
+      final snapConfirmado = await FirebaseFirestore.instance
           .collection('orders')
           .where('status', isEqualTo: 'pagamento_confirmado')
           .get();
 
-      debugPrint('[AdminAlert] ${snap.docs.length} pedido(s) pagamento_confirmado');
+      final allDocs = [...snapPendente.docs, ...snapConfirmado.docs];
+      debugPrint('[AdminAlert] ${allDocs.length} pedido(s) ativos (pendente=${snapPendente.docs.length}, confirmado=${snapConfirmado.docs.length})');
 
       bool newOrderFound = false;
-      for (final doc in snap.docs) {
+      for (final doc in allDocs) {
         if (!_knownOrderIds.contains(doc.id)) {
           _knownOrderIds.add(doc.id);
           newOrderFound = true;
