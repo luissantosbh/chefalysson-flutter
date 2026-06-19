@@ -109,14 +109,17 @@ class _RootViewState extends State<RootView> {
     }
 
     // Inicia/para o serviço de alerta sonoro conforme o status de admin
+    debugPrint('[RootView] build — isAdmin=${auth.isAdmin} isLoggedIn=${auth.isLoggedIn} _adminAlertStarted=$_adminAlertStarted');
     if (auth.isAdmin && !_adminAlertStarted) {
       _adminAlertStarted = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        debugPrint('[RootView] chamando startForAdmin()');
         context.read<AdminAlertService>().startForAdmin();
       });
     } else if (!auth.isAdmin && _adminAlertStarted) {
       _adminAlertStarted = false;
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        debugPrint('[RootView] chamando stop()');
         context.read<AdminAlertService>().stop();
       });
     }
