@@ -49,7 +49,7 @@ class OrderService extends ChangeNotifier {
         .toList();
 
     final total =
-        cartItems.fold<double>(0.0, (sum, ci) => sum + ci.item.price * ci.quantity);
+        cartItems.fold<double>(0.0, (acc, ci) => acc + ci.item.price * ci.quantity);
 
     await ref.set({
       'userId': userId,
@@ -57,7 +57,7 @@ class OrderService extends ChangeNotifier {
       'pixOrderId': pixOrderId,
       'items': itemsData,
       'total': total,
-      'status': OrderStatus.pendente.rawValue,
+      'status': OrderStatus.pagamentoConfirmado.rawValue,
       'createdAt': FieldValue.serverTimestamp(),
       if (deliveryAddress != null)
         'deliveryAddress': deliveryAddress.toMap(),
