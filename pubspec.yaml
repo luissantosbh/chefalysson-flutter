@@ -1,7 +1,7 @@
 name: chef_alysson
 description: App de delivery de comida japonesa — Chef Alysson
 publish_to: 'none'
-version: 1.0.0+8
+version: 1.1.0+9
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
