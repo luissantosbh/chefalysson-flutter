@@ -118,7 +118,19 @@
       "Bash($HOME/Library/Android/sdk/platform-tools/adb connect *)",
       "Bash(sips *)",
       "Bash(/Users/luissantos/Library/Android/sdk/platform-tools/adb devices *)",
-      "Bash($HOME/Library/Android/sdk/platform-tools/adb *)"
+      "Bash($HOME/Library/Android/sdk/platform-tools/adb *)",
+      "Bash(/Users/luissantos/Library/Android/sdk/platform-tools/adb disconnect *)",
+      "Bash(/Users/luissantos/Library/Android/sdk/platform-tools/adb reconnect *)",
+      "Bash(grep *)",
+      "Bash(unzip -l /Users/luissantos/Developer/AppChefAlysson/chef_alysson_flutter/build/app/outputs/flutter-apk/app-release.apk)",
+      "Bash(/Users/luissantos/Library/Android/sdk/platform-tools/adb -s emulator-5554 uninstall santos.chefalysson)",
+      "Bash(/Users/luissantos/Library/Android/sdk/platform-tools/adb -s emulator-5554 install /Users/luissantos/Developer/AppChefAlysson/chef_alysson_flutter/build/app/outputs/flutter-apk/app-release.apk)",
+      "Bash(/Users/luissantos/Library/Android/sdk/platform-tools/adb -s emulator-5554 logcat -c)",
+      "Bash(/Users/luissantos/Library/Android/sdk/platform-tools/adb -s adb-ZF525M6RFG-uTjFkW._adb-tls-connect._tcp. reconnect)",
+      "Bash(/Users/luissantos/Library/Android/sdk/platform-tools/adb -s adb-ZF525M6RFG-uTjFkW._adb-tls-connect._tcp. logcat -c)",
+      "Bash(/Users/luissantos/Library/Android/sdk/platform-tools/adb -s adb-ZF525M6RFG-uTjFkW._adb-tls-connect._tcp. install -r /Users/luissantos/Developer/AppChefAlysson/chef_alysson_flutter/build/app/outputs/flutter-apk/app-release.apk)",
+      "Bash(/Users/luissantos/Library/Android/sdk/platform-tools/adb -s adb-ZF525M6RFG-uTjFkW._adb-tls-connect._tcp. shell monkey -p santos.chefalysson 1)",
+      "Bash(ping *)"
     ]
   }
 }
