@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "3429544640-lem65s9ahre1g0hm6h1jvrajqbedl5lc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "santos.chefalysson",
+            "certificate_hash": "a34252b50a4d94ca8180f087b4c8dc8c88ad401a"
+          }
+        },
+        {
           "client_id": "3429544640-p3m77ecgemmgvo4cdsn5dgokd5ehq3d0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
