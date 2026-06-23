@@ -117,6 +117,12 @@ class _PixCheckoutViewState extends State<PixCheckoutView> {
         ),
         const SizedBox(height: 22),
 
+        // Banner taxa de entrega (oculto para admin)
+        if (!context.read<AuthService>().isAdmin) ...[
+          _buildDeliveryBanner(),
+          const SizedBox(height: 18),
+        ],
+
         // QR Code
         Center(
           child: Container(
@@ -238,6 +244,50 @@ class _PixCheckoutViewState extends State<PixCheckoutView> {
           textAlign: TextAlign.center,
         ),
       ],
+    );
+  }
+
+  // -------------------------------------------------------------------------
+  // Banner taxa de entrega
+  // -------------------------------------------------------------------------
+
+  Widget _buildDeliveryBanner() {
+    const headerStyle = TextStyle(
+      fontSize: 13,
+      fontWeight: FontWeight.w700,
+      color: Color(0xFF7A4F00),
+    );
+    const bodyStyle = TextStyle(fontSize: 12, color: Color(0xFF5C3A00), height: 1.6);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF3CD),
+        border: Border.all(color: const Color(0xFFFFD97D), width: 1),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text('🛵', style: TextStyle(fontSize: 16)),
+              SizedBox(width: 6),
+              Text('Taxa de entrega', style: headerStyle),
+            ],
+          ),
+          SizedBox(height: 6),
+          Text(
+            'O frete é cobrado separadamente pelo entregador. '
+            'Os valores são aproximados e podem variar conforme a distância:',
+            style: bodyStyle,
+          ),
+          SizedBox(height: 6),
+          Text('• Até 2km → R\$ 5,00 (ex: Serrano)', style: bodyStyle),
+          Text('• 2 a 5km → R\$ 10,00 (ex: Castelo, Santa Terezinha e Alípio de Melo)', style: bodyStyle),
+          Text('• Acima de 5km → R\$ 15,00 (ex: Buritis)', style: bodyStyle),
+        ],
+      ),
     );
   }
 
