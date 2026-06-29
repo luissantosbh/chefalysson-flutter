@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:chef_alysson/models/food_category.dart';
 import 'package:chef_alysson/models/menu_item.dart';
+import 'package:chef_alysson/services/auth_service.dart';
 import 'package:chef_alysson/services/cart_store.dart';
+import 'package:chef_alysson/services/manutencao_service.dart';
 import 'package:chef_alysson/services/menu_service.dart';
 
 class MenuView extends StatefulWidget {
@@ -36,6 +38,10 @@ class _MenuViewState extends State<MenuView> {
   @override
   Widget build(BuildContext context) {
     final menu = context.watch<MenuService>();
+    final auth = context.watch<AuthService>();
+    final emManutencao =
+        !auth.isAdmin && context.watch<ManutencaoService>().emManutencao;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('🍣 Cardápio'),
@@ -72,6 +78,31 @@ class _MenuViewState extends State<MenuView> {
       ),
       body: Column(
         children: [
+          // Banner de manutenção
+          if (emManutencao)
+            Container(
+              width: double.infinity,
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              color: Colors.orange.shade50,
+              child: const Row(
+                children: [
+                  Text('🍣', style: TextStyle(fontSize: 16)),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Pedidos temporariamente indisponíveis',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.deepOrange,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
           // Chips de categoria (visíveis somente fora da busca)
           if (_searchText.isEmpty)
             SizedBox(

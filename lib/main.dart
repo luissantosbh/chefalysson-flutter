@@ -11,6 +11,7 @@ import 'package:chef_alysson/services/address_service.dart';
 import 'package:chef_alysson/services/admin_alert_service.dart';
 import 'package:chef_alysson/services/auth_service.dart';
 import 'package:chef_alysson/services/cart_store.dart';
+import 'package:chef_alysson/services/manutencao_service.dart';
 import 'package:chef_alysson/services/menu_service.dart';
 import 'package:chef_alysson/services/order_service.dart';
 import 'package:chef_alysson/views/biografia_view.dart';
@@ -44,6 +45,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => AddressService()),
         ChangeNotifierProvider(create: (_) => MenuService()..startListening()),
         ChangeNotifierProvider(create: (_) => AdminAlertService()),
+        ChangeNotifierProvider(create: (_) => ManutencaoService()),
       ],
       child: const ChefAlyssonApp(),
     ),
@@ -63,7 +65,7 @@ class ChefAlyssonApp extends StatelessWidget {
       title: 'Chef Alysson',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorSchemeSeed: const Color(0xFFBF1921), // AccentRed
+        colorSchemeSeed: const Color(0xFFBF1921),
         useMaterial3: true,
         appBarTheme: const AppBarTheme(
           centerTitle: false,

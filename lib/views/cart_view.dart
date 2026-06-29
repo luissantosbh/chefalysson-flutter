@@ -8,6 +8,7 @@ import 'package:chef_alysson/models/cart_item.dart';
 import 'package:chef_alysson/services/address_service.dart';
 import 'package:chef_alysson/services/auth_service.dart';
 import 'package:chef_alysson/services/cart_store.dart';
+import 'package:chef_alysson/services/manutencao_service.dart';
 import 'package:chef_alysson/views/address_form_view.dart';
 import 'package:chef_alysson/views/pix_checkout_view.dart';
 
@@ -17,6 +18,28 @@ import 'package:chef_alysson/views/pix_checkout_view.dart';
 
 Future<void> _goToCheckout(BuildContext context) async {
   final auth = context.read<AuthService>();
+
+  // Bloqueia pedido se app estiver em manutenção (não afeta admins)
+  if (!auth.isAdmin && context.read<ManutencaoService>().emManutencao) {
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Em manutenção 🍣'),
+        content: const Text(
+          'Estamos em manutenção momentaneamente 🍣\n\n'
+          'Nossos pedidos voltam em breve!\n'
+          'Agradecemos sua compreensão 😊',
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Entendido'),
+          ),
+        ],
+      ),
+    );
+    return;
+  }
 
   // Popup de aviso apenas se: não for admin E horário for antes das 18h em BH (UTC-3)
   final nowBH = DateTime.now().toUtc().subtract(const Duration(hours: 3));
@@ -128,8 +151,35 @@ class CartView extends StatelessWidget {
   }
 
   Widget _buildCart(BuildContext context, CartStore cart) {
+    final auth = context.watch<AuthService>();
+    final emManutencao =
+        !auth.isAdmin && context.watch<ManutencaoService>().emManutencao;
+
     return Column(
       children: [
+        // Banner de manutenção no topo do carrinho
+        if (emManutencao)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            color: Colors.orange.shade50,
+            child: const Row(
+              children: [
+                Text('🍣', style: TextStyle(fontSize: 16)),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Pedidos temporariamente indisponíveis',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.deepOrange,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(vertical: 8),
@@ -173,15 +223,20 @@ class CartView extends StatelessWidget {
           child: SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: () { _goToCheckout(context); },
-              icon: const Icon(Icons.qr_code_rounded),
+              onPressed: () => _goToCheckout(context),
+              icon: Icon(emManutencao
+                  ? Icons.build_rounded
+                  : Icons.qr_code_rounded),
               label: Text(
-                'Pagar com PIX • ${cart.totalFormatted}',
+                emManutencao
+                    ? 'App em manutenção 🍣'
+                    : 'Pagar com PIX • ${cart.totalFormatted}',
                 style: const TextStyle(
                     fontWeight: FontWeight.bold, fontSize: 16),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+                backgroundColor:
+                    emManutencao ? Colors.grey.shade400 : Colors.red,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
