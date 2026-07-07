@@ -173,16 +173,12 @@ class AuthService extends ChangeNotifier {
         email: '',
         provider: AuthProvider.guest,
       );
-    } catch (_) {
-      // Fallback local
-      _user = AppUser(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        name: 'Convidado',
-        email: '',
-        provider: AuthProvider.guest,
-      );
+      _errorMessage = null;
+    } catch (e) {
+      debugPrint('[Guest] Falha ao entrar como convidado: $e');
+      _errorMessage = 'Não foi possível continuar como convidado. '
+          'Tente novamente ou faça login com Google/Apple.';
     }
-    _errorMessage = null;
     notifyListeners();
   }
 
