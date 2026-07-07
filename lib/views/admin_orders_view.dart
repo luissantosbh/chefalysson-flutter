@@ -231,6 +231,10 @@ class _AdminOrderCard extends StatelessWidget {
         ? '\n📝 *Observação:* $obs'
         : '';
 
+    final freteLine = order.deliveryFee > 0
+        ? '\n🛵 *Taxa de entrega:* ${order.deliveryFeeFormatted}'
+        : '';
+
     return '''🛵 *Novo pedido para entrega*
 
 👤 *Cliente:* $nome
@@ -240,7 +244,7 @@ $enderecoLines
 🍣 *Pedido:*
 $itensList$obsLine
 
-💰 *Total:* ${order.totalFormatted}
+💰 *Total:* ${order.totalFormatted}$freteLine
 💳 *Pagamento:* PIX''';
   }
 
@@ -280,6 +284,9 @@ $itensList$obsLine
     }
     buf.writeln('--------------------------------');
     buf.writeln('TOTAL: ${order.totalFormatted}');
+    if (order.deliveryFee > 0) {
+      buf.writeln('TAXA DE ENTREGA: ${order.deliveryFeeFormatted}');
+    }
     buf.writeln('PAGAMENTO: PIX');
     buf.write('================================');
     return buf.toString();

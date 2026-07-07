@@ -261,6 +261,14 @@ class _AddressFormViewState extends State<AddressFormView> {
                 if (digits.length == 8) _fetchCep(digits);
                 if (_cepError != null) setState(() => _cepError = null);
               },
+              validator: (v) {
+                final value = v?.trim() ?? '';
+                if (value.isEmpty) return 'Informe o CEP';
+                if (!RegExp(r'^\d{5}-\d{3}$').hasMatch(value)) {
+                  return 'CEP inválido (formato 00000-000)';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 16),
 

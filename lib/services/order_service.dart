@@ -36,6 +36,8 @@ class OrderService extends ChangeNotifier {
     DeliveryAddress? deliveryAddress,
     String? nomeCliente,
     String? observacao,
+    double deliveryFee = 0,
+    double? deliveryDistanceKm,
   }) async {
     final ref = FirebaseFirestore.instance.collection('orders').doc();
 
@@ -48,8 +50,9 @@ class OrderService extends ChangeNotifier {
             })
         .toList();
 
-    final total =
+    final itemsTotal =
         cartItems.fold<double>(0.0, (acc, ci) => acc + ci.item.price * ci.quantity);
+    final total = itemsTotal + deliveryFee;
 
     await ref.set({
       'userId': userId,
@@ -57,6 +60,8 @@ class OrderService extends ChangeNotifier {
       'pixOrderId': pixOrderId,
       'items': itemsData,
       'total': total,
+      'deliveryFee': deliveryFee,
+      if (deliveryDistanceKm != null) 'deliveryDistanceKm': deliveryDistanceKm,
       'status': OrderStatus.pagamentoConfirmado.rawValue,
       'createdAt': FieldValue.serverTimestamp(),
       if (deliveryAddress != null)
@@ -215,6 +220,8 @@ class OrderService extends ChangeNotifier {
       pixOrderId: pixId,
       items: items,
       total: total,
+      deliveryFee: (d['deliveryFee'] as num?)?.toDouble() ?? 0,
+      deliveryDistanceKm: (d['deliveryDistanceKm'] as num?)?.toDouble(),
       status: status,
       createdAt: createdAt,
       deliveryAddress: deliveryAddress,

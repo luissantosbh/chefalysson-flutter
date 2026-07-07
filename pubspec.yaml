@@ -32,8 +32,11 @@ dependencies:
   # Clipboard (Pix copia e cola)
   # já incluso no Flutter via Clipboard.setData
 
-  # HTTP para ViaCEP
+  # HTTP para ViaCEP e Nominatim (geocodificação)
   http: ^1.2.0
+
+  # Cálculo de distância para taxa de entrega
+  geolocator: ^13.0.2
 
   # Compartilhamento nativo (Share Sheet)
   share_plus: ^10.0.0

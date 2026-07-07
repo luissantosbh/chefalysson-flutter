@@ -9,8 +9,11 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:chef_alysson/services/address_service.dart';
 import 'package:chef_alysson/services/auth_service.dart';
 import 'package:chef_alysson/services/cart_store.dart';
+import 'package:chef_alysson/services/delivery_fee_calculator.dart';
+import 'package:chef_alysson/services/geocoding_service.dart';
 import 'package:chef_alysson/services/order_service.dart';
 import 'package:chef_alysson/services/pix_payload.dart';
+import 'package:chef_alysson/views/address_form_view.dart';
 
 class PixCheckoutView extends StatefulWidget {
   const PixCheckoutView({super.key});
@@ -26,18 +29,92 @@ class _PixCheckoutViewState extends State<PixCheckoutView> {
   bool _isSaving = false;
   String? _saveError;
 
+  // Taxa de entrega ------------------------------------------------------
+  bool _isLoadingFee = true;
+  String? _feeError;
+  double? _deliveryFee;
+  double? _distanciaKm;
+
   @override
   void initState() {
     super.initState();
     // Equivalente ao orderId gerado no init do SwiftUI view
     final ts = DateTime.now().millisecondsSinceEpoch ~/ 1000 % 100000000;
     _orderId = 'CA$ts';
+    _computeDeliveryFee();
   }
+
+  // -------------------------------------------------------------------------
+  // Cálculo da taxa de entrega (distância até o restaurante)
+  // -------------------------------------------------------------------------
+
+  Future<void> _computeDeliveryFee() async {
+    setState(() {
+      _isLoadingFee = true;
+      _feeError = null;
+    });
+
+    try {
+      final address = context.read<AddressService>().address;
+      if (address == null) {
+        throw const GeocodingException(
+            'Endereço de entrega não informado.');
+      }
+      if (address.cep.trim().isEmpty) {
+        throw const GeocodingException(
+            'CEP não informado no endereço de entrega. '
+            'Edite o endereço e informe o CEP para calcular a entrega.');
+      }
+
+      final point = await GeocodingService.instance.geocodeCep(address.cep);
+      final metros = DeliveryFeeCalculator.distanciaMetros(
+          point.latitude, point.longitude);
+      final taxa = DeliveryFeeCalculator.calcularTaxaEntrega(metros);
+
+      if (!mounted) return;
+      setState(() {
+        _distanciaKm = metros / 1000;
+        _deliveryFee = taxa;
+        _isLoadingFee = false;
+      });
+    } on GeocodingException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _feeError = e.message;
+        _isLoadingFee = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _feeError =
+            'Não foi possível calcular a taxa de entrega. Tente novamente.';
+        _isLoadingFee = false;
+      });
+    }
+  }
+
+  Future<void> _editAddress() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => AddressFormView(onSaved: () {})),
+    );
+    if (mounted) _computeDeliveryFee();
+  }
+
+  // -------------------------------------------------------------------------
+  // PIX
+  // -------------------------------------------------------------------------
+
+  double _totalWithDelivery(CartStore cart) => cart.total + (_deliveryFee ?? 0);
 
   String get _pixCode {
     final cart = context.read<CartStore>();
-    return PixPayload.generate(amount: cart.total, txid: _orderId);
+    return PixPayload.generate(
+        amount: _totalWithDelivery(cart), txid: _orderId);
   }
+
+  String _formatCurrency(double value) =>
+      'R\$ ${value.toStringAsFixed(2).replaceAll('.', ',')}';
 
   Future<void> _confirmPayment() async {
     final auth = context.read<AuthService>();
@@ -45,6 +122,7 @@ class _PixCheckoutViewState extends State<PixCheckoutView> {
     final orders = context.read<OrderService>();
 
     if (auth.user == null) return;
+    if (_deliveryFee == null) return;
 
     setState(() {
       _isSaving = true;
@@ -61,6 +139,8 @@ class _PixCheckoutViewState extends State<PixCheckoutView> {
         deliveryAddress: addrService.address,
         nomeCliente: addrService.nomeCliente,
         observacao: cart.observacao.isNotEmpty ? cart.observacao : null,
+        deliveryFee: _deliveryFee!,
+        deliveryDistanceKm: _distanciaKm,
       );
       if (mounted) setState(() => _orderConfirmed = true);
     } catch (e) {
@@ -85,7 +165,68 @@ class _PixCheckoutViewState extends State<PixCheckoutView> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
-        child: _orderConfirmed ? _buildConfirmation(cart) : _buildPayment(cart),
+        child: _orderConfirmed
+            ? _buildConfirmation(cart)
+            : _isLoadingFee
+                ? _buildFeeLoading()
+                : _feeError != null
+                    ? _buildFeeError()
+                    : _buildPayment(cart),
+      ),
+    );
+  }
+
+  // -------------------------------------------------------------------------
+  // Estado: calculando taxa de entrega
+  // -------------------------------------------------------------------------
+
+  Widget _buildFeeLoading() {
+    return const Padding(
+      padding: EdgeInsets.only(top: 80),
+      child: Column(
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(height: 18),
+          Text('Calculando a taxa de entrega...',
+              style: TextStyle(fontSize: 14, color: Colors.grey)),
+        ],
+      ),
+    );
+  }
+
+  // -------------------------------------------------------------------------
+  // Estado: erro ao calcular a taxa
+  // -------------------------------------------------------------------------
+
+  Widget _buildFeeError() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 60),
+      child: Column(
+        children: [
+          const Text('📍', style: TextStyle(fontSize: 48)),
+          const SizedBox(height: 14),
+          Text(_feeError!,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 14, color: Colors.grey)),
+          const SizedBox(height: 22),
+          ElevatedButton.icon(
+            onPressed: _computeDeliveryFee,
+            icon: const Icon(Icons.refresh_rounded),
+            label: const Text('Tentar novamente'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+              shape:
+                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextButton(
+            onPressed: _editAddress,
+            child: const Text('Editar endereço de entrega'),
+          ),
+        ],
       ),
     );
   }
@@ -96,6 +237,7 @@ class _PixCheckoutViewState extends State<PixCheckoutView> {
 
   Widget _buildPayment(CartStore cart) {
     final code = _pixCode;
+    final total = _totalWithDelivery(cart);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -103,10 +245,10 @@ class _PixCheckoutViewState extends State<PixCheckoutView> {
         // Valor
         Column(
           children: [
-            const Text('Valor do pedido',
+            const Text('Valor a pagar',
                 style: TextStyle(fontSize: 13, color: Colors.grey)),
             const SizedBox(height: 4),
-            Text(cart.totalFormatted,
+            Text(_formatCurrency(total),
                 style: const TextStyle(
                     fontSize: 40,
                     fontWeight: FontWeight.w900,
@@ -117,11 +259,9 @@ class _PixCheckoutViewState extends State<PixCheckoutView> {
         ),
         const SizedBox(height: 22),
 
-        // Banner taxa de entrega (oculto para admin)
-        if (!context.read<AuthService>().isAdmin) ...[
-          _buildDeliveryBanner(),
-          const SizedBox(height: 18),
-        ],
+        // Resumo do pedido (itens + entrega)
+        _buildFeeSummary(cart),
+        const SizedBox(height: 18),
 
         // QR Code
         Center(
@@ -248,46 +388,47 @@ class _PixCheckoutViewState extends State<PixCheckoutView> {
   }
 
   // -------------------------------------------------------------------------
-  // Banner taxa de entrega
+  // Resumo: pedido + entrega + total
   // -------------------------------------------------------------------------
 
-  Widget _buildDeliveryBanner() {
-    const headerStyle = TextStyle(
-      fontSize: 13,
-      fontWeight: FontWeight.w700,
-      color: Color(0xFF7A4F00),
-    );
-    const bodyStyle = TextStyle(fontSize: 12, color: Color(0xFF5C3A00), height: 1.6);
+  Widget _buildFeeSummary(CartStore cart) {
+    final distanciaStr = _distanciaKm!.toStringAsFixed(1).replaceAll('.', ',');
+    final total = _totalWithDelivery(cart);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF3CD),
-        border: Border.all(color: const Color(0xFFFFD97D), width: 1),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(14),
       ),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
         children: [
-          Row(
-            children: [
-              Text('🛵', style: TextStyle(fontSize: 16)),
-              SizedBox(width: 6),
-              Text('Taxa de entrega', style: headerStyle),
-            ],
+          _summaryRow('Pedido', cart.totalFormatted),
+          const SizedBox(height: 6),
+          _summaryRow(
+              'Entrega ($distanciaStr km)', _formatCurrency(_deliveryFee!)),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Divider(height: 1),
           ),
-          SizedBox(height: 6),
-          Text(
-            'O frete é cobrado separadamente pelo entregador. '
-            'Os valores são aproximados e podem variar conforme a distância:',
-            style: bodyStyle,
-          ),
-          SizedBox(height: 6),
-          Text('• Até 2km → R\$ 5,00 (ex: Serrano)', style: bodyStyle),
-          Text('• 2 a 5km → R\$ 10,00 (ex: Castelo, Santa Terezinha e Alípio de Melo)', style: bodyStyle),
-          Text('• Acima de 5km → R\$ 15,00 (ex: Buritis)', style: bodyStyle),
+          _summaryRow('Total', _formatCurrency(total), bold: true),
         ],
       ),
+    );
+  }
+
+  Widget _summaryRow(String label, String value, {bool bold = false}) {
+    final style = TextStyle(
+      fontSize: bold ? 15 : 13,
+      fontWeight: bold ? FontWeight.w800 : FontWeight.w500,
+      color: bold ? null : Colors.grey[700],
+    );
+    return Row(
+      children: [
+        Text(label, style: style),
+        const Spacer(),
+        Text(value, style: style),
+      ],
     );
   }
 

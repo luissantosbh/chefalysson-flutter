@@ -120,6 +120,8 @@ class Order {
   final String pixOrderId;
   final List<OrderLineItem> items;
   final double total;
+  final double deliveryFee;
+  final double? deliveryDistanceKm;
   OrderStatus status;
   final DateTime createdAt;
   final DeliveryAddress? deliveryAddress;
@@ -133,6 +135,8 @@ class Order {
     required this.pixOrderId,
     required this.items,
     required this.total,
+    this.deliveryFee = 0,
+    this.deliveryDistanceKm,
     required this.status,
     required this.createdAt,
     this.deliveryAddress,
@@ -140,4 +144,7 @@ class Order {
 
   String get totalFormatted =>
       'R\$ ${total.toStringAsFixed(2).replaceAll('.', ',')}';
+
+  String get deliveryFeeFormatted =>
+      'R\$ ${deliveryFee.toStringAsFixed(2).replaceAll('.', ',')}';
 }
