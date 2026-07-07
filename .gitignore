@@ -44,3 +44,10 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 *.jks
+
+# Claude Code — estado local/de sessão (não pertence ao repositório)
+.claude/scheduled_tasks.lock
+.claude/settings.local.json
+
+# Dependências de scripts locais
+scripts/node_modules/
