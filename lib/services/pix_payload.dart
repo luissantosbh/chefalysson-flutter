@@ -4,8 +4,8 @@
 // definido pelo Banco Central do Brasil, incluindo o CRC16 obrigatório.
 
 class PixPayload {
-  /// Chave PIX do estabelecimento (CNPJ)
-  static const pixKey = '22946997000100';
+  /// Chave PIX do estabelecimento (celular, formato internacional E.164)
+  static const pixKey = '+5531992676460';
 
   /// Nome do recebedor (máx. 25 caracteres, sem acentos)
   static const merchantName = 'CHEF ALYSSON';
